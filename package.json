@@ -1,0 +1,25 @@
+{
+  "name": "nestjs-component-testing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "live-server presentations"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dimkinv/nestjs-component-testing.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/dimkinv/nestjs-component-testing/issues"
+  },
+  "homepage": "https://github.com/dimkinv/nestjs-component-testing#readme",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Component Testing in Nest.js - Course</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #6366f1 0%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #a0aec0;
+            font-weight: 300;
+        }
+
+        .course-info {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .course-info p {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .meetings {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .meeting-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(167, 139, 250, 0.05) 100%);
+            border: 2px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 35px 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .meeting-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .meeting-card:hover {
+            border-color: rgba(99, 102, 241, 0.5);
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(99, 102, 241, 0.15);
+        }
+
+        .meeting-card:hover::before {
+            left: 100%;
+        }
+
+        .meeting-number {
+            display: inline-block;
+            background: linear-gradient(135deg, #6366f1 0%, #a78bfa 100%);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .meeting-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+            color: #f1f5f9;
+        }
+
+        .meeting-card p {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .meeting-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #6366f1 0%, #a78bfa 100%);
+            color: white;
+            padding: 12px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .meeting-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .meeting-link:active {
+            transform: translateY(0);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(148, 163, 184, 0.2);
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .subtitle {
+                font-size: 1.1rem;
+            }
+
+            .meetings {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Component Testing in Nest.js</h1>
+            <p class="subtitle">A Comprehensive Course on Testing Strategies for Modern Node.js Applications</p>
+        </header>
+
+        <div class="course-info">
+            <p>This 9-hour course is divided into three 3-hour sessions covering testing fundamentals, Nest.js component testing basics, and advanced techniques with external dependencies.</p>
+        </div>
+
+        <div class="meetings">
+            <div class="meeting-card">
+                <div class="meeting-number">1</div>
+                <h2>Foundations and Testing Strategy</h2>
+                <p>Understand why component testing matters, explore the test pyramid and modern testing strategies, and learn when to use component tests in Node.js/Nest.js projects.</p>
+                <a href="meeting-1.html" class="meeting-link">View Presentation →</a>
+            </div>
+
+            <div class="meeting-card">
+                <div class="meeting-number">2</div>
+                <h2>Nest.js Component Testing Basics</h2>
+                <p>Master Nest.js testing modules, learn component test setup patterns, and explore contract testing and API mocking with Mock Service Worker.</p>
+                <a href="meeting-2.html" class="meeting-link">View Presentation →</a>
+            </div>
+
+            <div class="meeting-card">
+                <div class="meeting-number">3</div>
+                <h2>Component Tests with External Dependencies</h2>
+                <p>Learn Testcontainers basics, master container scope decisions, and explore event-based testing with Kafka, observability in tests, and flaky test prevention.</p>
+                <a href="meeting-3.html" class="meeting-link">View Presentation →</a>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2026 Component Testing in Nest.js Course. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>
