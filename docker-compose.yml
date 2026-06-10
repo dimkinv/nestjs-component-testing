@@ -1,0 +1,13 @@
+services:
+  mongodb:
+    image: mongo:8.0
+    container_name: launch-pad-mongodb
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_DATABASE: launchpad
+    volumes:
+      - mongodb-data:/data/db
+
+volumes:
+  mongodb-data:

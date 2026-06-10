@@ -1,0 +1,14 @@
+meta {
+  name: Add Favorite
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/launches/{{launchId}}/favorite
+  body: none
+}
+
+headers {
+  x-user-id: {{userId}}
+}
