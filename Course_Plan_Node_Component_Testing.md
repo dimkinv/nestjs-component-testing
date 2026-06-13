@@ -8,7 +8,7 @@
 
 ## 1. Course Overview
 
-An **interactive, hands-on course** on component testing in Node.js (using Nest.js). Students work with a pre-built backend application — **"LaunchPad"** — that displays SpaceX current, past, and scheduled launches. The app integrates with an external API, a database, and Azure Event Hub, giving students a rich surface to practice writing component tests across all integration boundaries.
+An **interactive, hands-on course** on component testing in Node.js (using Nest.js). Students work with a pre-built backend application — **"LaunchPad"** — that displays current and scheduled rocket launches from Launch Library 2 (LL2). The app integrates with an external API, a database, and Azure Event Hub, giving students a rich surface to practice writing component tests across all integration boundaries.
 
 > **Important:** The LaunchPad app is **fully pre-implemented by the instructor**. Students receive the complete working application and focus exclusively on writing component tests.
 
@@ -43,7 +43,7 @@ An **interactive, hands-on course** on component testing in Node.js (using Nest.
 
 | # | Decision | Choice | Rationale |
 |---|----------|--------|-----------|
-| 1 | External API | **SpaceX API v4** | No auth, rich data, simple REST, great fit for space theme. |
+| 1 | External API | **Launch Library 2 (LL2)** | No auth, free tier, detailed launch metadata, stable REST API for the space theme. |
 | 2 | Event System | **Azure Event Hub** | Aligns with team's cloud stack. Emulator available as Docker container. |
 | 3 | Event Hub Client | **`@azure/event-hubs`** (official npm) | Official Azure SDK — same library used in production. |
 | 4 | ORM | **TypeORM** | Nest.js native integration, well-documented, sufficient for the course. |
@@ -55,22 +55,20 @@ An **interactive, hands-on course** on component testing in Node.js (using Nest.
 
 ## 4. Integration Research
 
-### 4.1 External Launch API — SpaceX API v4 ✅
+### 4.1 External Launch API — Launch Library 2 (LL2) ✅
 
 | Field | Details |
 |-------|---------|
-| **URL** | `api.spacexdata.com/v4` |
+| **URL** | `ll.thespacedevs.com/2.3.0` |
 | **Auth** | None required |
 | **Status** | ✅ Operational |
-| **Data** | Past launches, upcoming launches, latest launch, rockets, cores, capsules, launchpads |
-| **Notes** | Repo archived but API is live and stable. Rich JSON responses, simple REST endpoints. |
+| **Data** | Upcoming launches, previous launches, launch details, launcher configurations, pads, missions |
+| **Notes** | Production is rate limited; dev endpoint is available for development. Component tests still mock all upstream HTTP with MSW. |
 
 **Key endpoints used in the app:**
-- `GET /v4/launches` — all launches  
-- `GET /v4/launches/:id` — single launch  
-- `GET /v4/launches/upcoming` — upcoming launches  
-- `GET /v4/launches/past` — past launches  
-- `GET /v4/rockets/:id` — rocket details  
+- `GET /2.3.0/launches/upcoming/?mode=normal&limit=20&format=json` — launch list  
+- `GET /2.3.0/launches/{id}/?mode=detailed&format=json` — single launch  
+- `GET /2.3.0/launcher_configurations/{id}/?format=json` — rocket details  
 
 ### 4.2 Azure Event Hub — Emulator & Testcontainers
 
@@ -140,7 +138,7 @@ Launch milestones are **simulated** by the app via an API trigger (`POST /launch
 │  ┌───────────────┐  ┌───────────────┐  ┌──────────────────────┐  │
 │  │   API Layer   │  │   DB Layer    │  │    Event Layer       │  │
 │  │               │  │               │  │                      │  │
-│  │  SpaceX API   │  │  PostgreSQL   │  │  Azure Event Hub     │  │
+│  │    LL2 API    │  │  PostgreSQL   │  │  Azure Event Hub     │  │
 │  │  (external)   │  │  (TypeORM)    │  │  (@azure/event-hubs) │  │
 │  └───────┬───────┘  └───────┬───────┘  └──────────┬───────────┘  │
 │          │                  │                     │              │
@@ -153,7 +151,7 @@ Launch milestones are **simulated** by the app via an API trigger (`POST /launch
 
 | Layer | Production | Component Test Tool |
 |-------|-----------|---------------------|
-| **External API** | HTTP calls to SpaceX API v4 | **MSW** (Mock Service Worker) |
+| **External API** | HTTP calls to LL2 | **MSW** (Mock Service Worker) |
 | **Database** | PostgreSQL via **TypeORM** | **Testcontainers** (`PostgreSQL` module) |
 | **Event Stream** | **Azure Event Hub** via `@azure/event-hubs` SDK | **Testcontainers** (`GenericContainer` — Azurite + Event Hub Emulator) |
 
@@ -190,8 +188,8 @@ Launch milestones are **simulated** by the app via an API trigger (`POST /launch
 
 | # | Endpoint | Method | Description | Testing Layer |
 |---|----------|--------|-------------|---------------|
-| 1 | `/launches` | GET | List all launches (past + upcoming) from SpaceX API | API mocking (MSW) |
-| 2 | `/launches/:id` | GET | Get launch details by ID from SpaceX API | API mocking (MSW) |
+| 1 | `/launches` | GET | List launches from LL2 | API mocking (MSW) |
+| 2 | `/launches/:id` | GET | Get launch details by ID from LL2 | API mocking (MSW) |
 | 3 | `/launches/:id/favorite` | POST | Mark a launch as favorite (save to DB). Requires `x-user-id` header. | Database (Testcontainers + PostgreSQL) |
 | 4 | `/launches/:id/favorite` | DELETE | Remove a launch from favorites. Requires `x-user-id` header. | Database (Testcontainers + PostgreSQL) |
 | 5 | `/favorites` | GET | Get all favorite launches for a user. Requires `x-user-id` header. | Database (Testcontainers + PostgreSQL) |
@@ -222,7 +220,7 @@ Launch milestones are **simulated** by the app via an API trigger (`POST /launch
 | Time | Topic | Activity |
 |------|-------|----------|
 | 0:00–0:10 | Recap + Q&A from Meeting 1 | Discussion |
-| 0:10–0:40 | **Exercise 1: API mocking with MSW** | Hands-on: write component tests for `GET /launches` and `GET /launches/:id` — mock SpaceX API responses with MSW |
+| 0:10–0:40 | **Exercise 1: API mocking with MSW** | Hands-on: write component tests for `GET /launches` and `GET /launches/:id` — mock LL2 API responses with MSW |
 | 0:40–0:55 | Testcontainers basics for Node.js | Lecture + demo: spinning up PostgreSQL & Event Hub emulator using `GenericContainer` |
 | 0:55–1:05 | **Break** | |
 | 1:05–1:35 | **Exercise 2: DB testing with Testcontainers** | Hands-on: write component tests for `POST /launches/:id/favorite` and `GET /favorites` — real PostgreSQL via Testcontainers |
@@ -236,13 +234,13 @@ Launch milestones are **simulated** by the app via an API trigger (`POST /launch
 
 | Deliverable | Description | Status |
 |-------------|-------------|--------|
-| **LaunchPad Nest.js App** | Fully working app with SpaceX API integration, TypeORM + PostgreSQL, Azure Event Hub publisher/consumer via `@azure/event-hubs` | 🔲 To build |
+| **LaunchPad Nest.js App** | Fully working app with LL2 integration, TypeORM + PostgreSQL, Azure Event Hub publisher/consumer via `@azure/event-hubs` | 🔲 To build |
 | **`docker-compose.yml`** | Local dev setup: PostgreSQL + Azurite + Azure Event Hub emulator containers | 🔲 To build |
 | **Skeleton Test Files** | Test files with `TODO` comments and hints guiding students through each exercise | 🔲 To build |
 | **Solution Branch** | Completed tests on a separate Git branch (`solutions`) for instructor reference | 🔲 To build |
 | **README** | Setup instructions, prerequisites check, architecture diagram, exercise overview | 🔲 To build |
 | **Slide Deck** | Lecture slides for theoretical portions of both meetings | 🔲 To build |
-| **SpaceX API Response Fixtures** | Sample JSON responses from SpaceX API for MSW mocking | 🔲 To build |
+| **LL2 API Response Fixtures** | Sample JSON responses from LL2 for MSW mocking | 🔲 To build |
 | **Launch Event Fixtures** | Sample milestone event payloads for Event Hub testing | 🔲 To build |
 
 ---

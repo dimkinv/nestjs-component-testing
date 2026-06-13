@@ -296,12 +296,12 @@
 				<section>
 					<h2>How LaunchPad maps to those layers</h2>
 					<ul>
-						<li><code>GET /launches</code> -> SpaceX API -> MSW</li>
+						<li><code>GET /launches</code> -> LL2 API -> MSW</li>
 						<li><code>POST /favorite</code> -> PostgreSQL -> Testcontainers</li>
 						<li><code>POST /simulate</code> -> Event Hub -> containers</li>
 					</ul>
 					<aside class="notes">
-						Spell out the full mapping here. GET /launches and GET /launches/:id exercise the external SpaceX API boundary with MSW. POST /launches/:id/favorite and GET /favorites exercise PostgreSQL persistence with Testcontainers. POST /launches/:id/simulate plus GET /launches/:id/events exercise Azure Event Hub messaging with GenericContainer-based infrastructure.
+						Spell out the full mapping here. GET /launches and GET /launches/:id exercise the external LL2 API boundary with MSW. POST /launches/:id/favorite and GET /favorites exercise PostgreSQL persistence with Testcontainers. POST /launches/:id/simulate plus GET /launches/:id/events exercise Azure Event Hub messaging with GenericContainer-based infrastructure.
 					</aside>
 				</section>
 

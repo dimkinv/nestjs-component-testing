@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { HydratedDocument, Model, Schema } from 'mongoose';
+import { Ll2Service } from './ll2.service';
 
-export type LaunchStatus = 'past' | 'upcoming';
+type LaunchSummaries = Awaited<ReturnType<Ll2Service['getLaunches']>>;
+type LaunchDetail = Awaited<ReturnType<Ll2Service['getLaunchById']>>;
+
 export type MilestoneType =
   | 'COUNTDOWN'
   | 'LIFTOFF'
@@ -10,28 +13,6 @@ export type MilestoneType =
   | 'MECO'
   | 'STAGE_SEPARATION'
   | 'PAYLOAD_DEPLOY';
-
-export interface LaunchSummary {
-  id: string;
-  name: string;
-  status: LaunchStatus;
-  missionName: string;
-  launchDateUtc: string;
-}
-
-export interface LaunchDetails extends LaunchSummary {
-  rocket: {
-    id: string;
-    name: string;
-    type: string;
-  };
-  launchpad: {
-    id: string;
-    name: string;
-    locality: string;
-  };
-  details: string;
-}
 
 export class FavoriteLaunch {
   userId!: string;
@@ -63,7 +44,8 @@ export class LaunchMilestoneEvent {
   publishedAt!: string;
 }
 
-export type LaunchMilestoneEventDocument = HydratedDocument<LaunchMilestoneEvent>;
+export type LaunchMilestoneEventDocument =
+  HydratedDocument<LaunchMilestoneEvent>;
 
 export const LaunchMilestoneEventSchema = new Schema<LaunchMilestoneEvent>(
   {
@@ -82,52 +64,12 @@ export const LaunchMilestoneEventSchema = new Schema<LaunchMilestoneEvent>(
 @Injectable()
 export class AppService {
   constructor(
+    private readonly ll2Service: Ll2Service,
     @InjectModel(FavoriteLaunch.name)
     private readonly favoriteLaunchModel: Model<FavoriteLaunch>,
     @InjectModel(LaunchMilestoneEvent.name)
     private readonly launchMilestoneEventModel: Model<LaunchMilestoneEvent>,
   ) {}
-
-  private readonly launches: LaunchDetails[] = [
-    {
-      id: 'falcon9-starlink-1',
-      name: 'Starlink Group 9-1',
-      status: 'past',
-      missionName: 'Starlink deployment mission',
-      launchDateUtc: '2026-04-18T10:12:00.000Z',
-      rocket: {
-        id: 'falcon9',
-        name: 'Falcon 9',
-        type: 'FT',
-      },
-      launchpad: {
-        id: 'lc-39a',
-        name: 'Launch Complex 39A',
-        locality: 'Kennedy Space Center',
-      },
-      details:
-        'Mock launch details for a past Falcon 9 mission used by the course backend.',
-    },
-    {
-      id: 'falcon9-crew-orbit',
-      name: 'Crew Orbital Demo',
-      status: 'upcoming',
-      missionName: 'Crewed orbital demonstration flight',
-      launchDateUtc: '2026-11-02T14:30:00.000Z',
-      rocket: {
-        id: 'falcon9',
-        name: 'Falcon 9',
-        type: 'Block 5',
-      },
-      launchpad: {
-        id: 'slc-40',
-        name: 'SLC-40',
-        locality: 'Cape Canaveral',
-      },
-      details:
-        'Mock launch details for an upcoming mission that can be used in API and event tests.',
-    },
-  ];
 
   private readonly eventsByLaunchId: Record<string, LaunchMilestoneEvent[]> = {
     'falcon9-starlink-1': [
@@ -160,15 +102,15 @@ export class AppService {
     ],
   };
 
-  getLaunches(): { data: LaunchSummary[] } {
+  async getLaunches(): Promise<{ data: LaunchSummaries }> {
     return {
-      data: this.launches.map(({ rocket, launchpad, details, ...launch }) => launch),
+      data: await this.ll2Service.getLaunches(),
     };
   }
 
-  getLaunchById(id: string): { data: LaunchDetails | null } {
+  async getLaunchById(id: string): Promise<{ data: LaunchDetail }> {
     return {
-      data: this.launches.find((launch) => launch.id === id) ?? null,
+      data: await this.ll2Service.getLaunchById(id),
     };
   }
 
@@ -199,7 +141,10 @@ export class AppService {
     launchId: string,
     userId: string,
   ): Promise<{ data: { removed: boolean; userId: string; launchId: string } }> {
-    const result = await this.favoriteLaunchModel.deleteOne({ userId, launchId });
+    const result = await this.favoriteLaunchModel.deleteOne({
+      userId,
+      launchId,
+    });
 
     return {
       data: {
@@ -221,22 +166,21 @@ export class AppService {
     };
   }
 
-  async simulateLaunch(
-    launchId: string,
-  ): Promise<{
-    data: { launchId: string; status: 'queued'; events: LaunchMilestoneEvent[] };
+  async simulateLaunch(launchId: string): Promise<{
+    data: {
+      launchId: string;
+      status: 'queued';
+      events: LaunchMilestoneEvent[];
+    };
   }> {
-    const events = this.eventsByLaunchId[launchId] ?? this.buildDefaultEvents(launchId);
+    const events =
+      this.eventsByLaunchId[launchId] ?? this.buildDefaultEvents(launchId);
 
     await Promise.all(
       events.map((event) =>
-        this.launchMilestoneEventModel.updateOne(
-          { id: event.id },
-          event,
-          {
-            upsert: true,
-          },
-        ),
+        this.launchMilestoneEventModel.updateOne({ id: event.id }, event, {
+          upsert: true,
+        }),
       ),
     );
 
@@ -261,7 +205,8 @@ export class AppService {
       data:
         events.length > 0
           ? events.map((event) => this.mapEvent(event))
-          : this.eventsByLaunchId[launchId] ?? this.buildDefaultEvents(launchId),
+          : (this.eventsByLaunchId[launchId] ??
+            this.buildDefaultEvents(launchId)),
     };
   }
 
