@@ -15,15 +15,8 @@
 		<link rel="stylesheet" href="revealjs/dist/plugin/highlight/monokai.css" />
 		<style>
 			:root {
-				--accent: #57d3ff;
 				--accent-soft: rgba(87, 211, 255, 0.16);
 				--accent-warm: #ffd166;
-				--text-soft: #b8c7d1;
-				--danger: #ff6b6b;
-				--success: #80ed99;
-			}
-
-			.reveal {
 				font-size: 34px;
 			}
 
@@ -185,6 +178,58 @@
 			.reveal .success {
 				color: var(--success);
 			}
+
+			.reveal pre code {
+				font-size: 0.72em;
+				line-height: 1.35;
+			}
+
+			.reveal .noborder td {
+				border: none !important;
+			}
+
+			.reveal .intro-test-layer {
+				font-size: 18px;
+				height: 80px;
+				width: 120px;
+				border: 3px solid red;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				margin-left: 20px;
+				text-transform: none;
+			}
+
+			.reveal .intro-test-arrow {
+				margin-top: 20px;
+				height: 10px;
+				background: green;
+				position: relative;
+			}
+
+			.reveal .intro-test-arrow::after {
+				top: -10px;
+				right: -15px;
+				display: block;
+				content: '';
+				position: absolute;
+				border-top: 15px solid transparent;
+				border-bottom: 15px solid transparent;
+				border-left: 15px solid green;
+			}
+
+			.reveal .intro-test-diagram {
+				align-items: center;
+				display: flex;
+				justify-content: center;
+			}
+
+			.reveal .intro-test-diagram aside {
+				height: 100px;
+				width: 10px;
+				background: green;
+				margin-left: 20px;
+			}
 		</style>
 	</head>
 	<body>
@@ -192,19 +237,142 @@
 			<div class="slides">
 				<section>
 					<div class="hero">
-						<div class="eyebrow">Meeting 1</div>
+						<div class="eyebrow">Module 1</div>
 						<h1>Foundations and Testing Strategy in Node.js</h1>
 						<p><span class="accent">Component testing</span> for real Nest.js behavior</p>
-						<div class="pill-row">
-							<span class="pill">Nest.js</span>
-							<span class="pill">Jest</span>
-							<span class="pill">MSW</span>
-							<span class="pill">Testcontainers</span>
-						</div>
 					</div>
 					<aside class="notes">
-						This meeting sets up the testing strategy before the hands-on work. The key framing is that component testing sits between isolated unit tests and broad end-to-end checks, and it is the level we will emphasize for the LaunchPad backend.
+						This meeting sets up the testing strategy before the hands-on work. The key framing is that component testing sits between isolated unit tests and broad end-to-end checks, and it is the level we will emphasize for the LaunchPad backend. Keep the tooling message narrow today: Nest TestingModule, realistic module wiring, and selective mocking.
 					</aside>
+				</section>
+
+				<section>
+					<h3>Orbital Mechanics</h3>
+					<p>This is what most of us think happen!</p>
+					<img src="./images/rocket-vertical.avif" alt="Rocket going straight up" />
+				</section>
+
+				<section>
+					<h3>Orbital Mechanics</h3>
+					<p>This is what actually happen</p>
+					<img width="600" src="./images/launch-spacex.jpeg" alt="SpaceX rocket launch trajectory" />
+				</section>
+
+				<section>
+					<h4>Super Fast Orbital Mechanics Intro by kerbals</h4>
+					<p>How orbits work</p>
+					<img width="500" src="./images/1200px-Newton_Cannon.svg.png" alt="Newton cannon orbit diagram" />
+				</section>
+
+				<section>
+					<h4>Super Fast Orbital Mechanics Intro by kerbals</h4>
+					<img
+						style="height: 150px; background-size: contain; position: absolute; left: 20px; transform: rotate(30deg)"
+						src="./images/kerbal1.png"
+						alt="Kerbal character"
+					/>
+					<img
+						style="height: 150px; background-size: contain; position: absolute; right: 20px; transform: rotate(-145deg)"
+						src="./images/kerbal2.webp"
+						alt="Kerbal character"
+					/>
+					<p>Types of orbits</p>
+					<img src="./images/orbits.jpeg" alt="Orbit types" />
+				</section>
+
+				<section>
+					<h3>So why to test anyway?</h3>
+					<div style="display: flex; justify-content: center">
+						<div class="fragment" style="margin-right: 20px">
+							<div>Ariane 5</div>
+							<img height="500" src="./images/ariane5.png" alt="Ariane 5 launch" />
+						</div>
+						<div class="fragment">
+							<div>Ariane 5 T+00:39</div>
+							<img height="500" src="./images/ariane5-accident.jpg" alt="Ariane 5 explosion" />
+						</div>
+					</div>
+				</section>
+
+				<section>
+					<p>
+						...software <b style="color: red">exception</b> was caused during execution of a data conversion from
+						64-bit floating point to 16-bit signed integer value...
+					</p>
+					<p class="fragment">
+						...function was not tested under simulated Ariane 5 flight conditions, and the design error was
+						not discovered.
+					</p>
+					<div style="text-align: right; font-style: italic; font-size: 14px">Official Inquiry Board report</div>
+				</section>
+
+				<section>
+					<h3 style="color: red">~500M USD bug!</h3>
+				</section>
+
+				<section>
+					<h3>Different types of tests</h3>
+					<div class="r-stack">
+						<div class="intro-test-diagram fragment fade-out" data-fragment-index="0">
+							<div class="intro-test-layer">client</div>
+							<div class="intro-test-layer">gateway</div>
+							<div class="intro-test-layer">controller</div>
+							<div class="intro-test-layer">service</div>
+							<div class="intro-test-layer">DAL</div>
+							<div class="intro-test-layer">DB</div>
+						</div>
+						<div class="intro-test-diagram fragment fade-in-then-out" data-fragment-index="0">
+							<aside></aside>
+							<div class="intro-test-layer">client</div>
+							<div class="intro-test-layer">gateway</div>
+							<div class="intro-test-layer">controller</div>
+							<div class="intro-test-layer">service</div>
+							<div class="intro-test-layer">DAL</div>
+							<div class="intro-test-layer">DB</div>
+							<aside></aside>
+						</div>
+						<div class="intro-test-diagram fragment fade-in-then-out" data-fragment-index="1">
+							<div class="intro-test-layer">client</div>
+							<aside></aside>
+							<div class="intro-test-layer">gateway</div>
+							<div class="intro-test-layer">controller</div>
+							<div class="intro-test-layer">service</div>
+							<div class="intro-test-layer">DAL</div>
+							<div class="intro-test-layer">DB</div>
+							<aside></aside>
+						</div>
+						<div class="intro-test-diagram fragment fade-in-then-out" data-fragment-index="2">
+							<div class="intro-test-layer">client</div>
+							<div class="intro-test-layer">gateway</div>
+							<aside></aside>
+							<div class="intro-test-layer">controller</div>
+							<div class="intro-test-layer">service</div>
+							<aside></aside>
+							<div class="intro-test-layer">DAL</div>
+							<div class="intro-test-layer">DB</div>
+						</div>
+						<div class="intro-test-diagram fragment fade-in-then-out" data-fragment-index="3">
+							<div class="intro-test-layer">client</div>
+							<div class="intro-test-layer">gateway</div>
+							<aside></aside>
+							<div class="intro-test-layer">controller</div>
+							<aside></aside>
+							<div class="intro-test-layer">service</div>
+							<div class="intro-test-layer">DAL</div>
+							<div class="intro-test-layer">DB</div>
+						</div>
+						<div class="intro-test-diagram fragment fade-in" data-fragment-index="4">
+							<aside></aside>
+							<div class="intro-test-layer">client</div>
+							<aside></aside>
+							<div class="intro-test-layer">gateway</div>
+							<div class="intro-test-layer">controller</div>
+							<div class="intro-test-layer">service</div>
+							<div class="intro-test-layer">DAL</div>
+							<div class="intro-test-layer">DB</div>
+						</div>
+					</div>
+					<div class="intro-test-arrow"></div>
 				</section>
 
 				<section>
@@ -212,11 +380,24 @@
 					<ul>
 						<li>Why unit tests are not enough</li>
 						<li>UT + component + integration</li>
-						<li>API, DB, messaging, external services</li>
+						<li>What a component means in Nest.js</li>
+						<li>TestingModule and selective mocking</li>
 						<li>Map it to LaunchPad</li>
 					</ul>
 					<aside class="notes">
 						Keep this as the agenda slide. The purpose is to orient the room, not explain each item yet.
+					</aside>
+				</section>
+
+				<section>
+					<h2>Meeting 1 boundary</h2>
+					<ul>
+						<li>No infrastructure containers yet</li>
+						<li>Focus on <span class="accent">application wiring</span> inside Nest</li>
+						<li>Goal: write near-E2E tests with controlled seams</li>
+					</ul>
+					<aside class="notes">
+						Set expectations explicitly. Today is about becoming effective with Nest's testing primitives. Students should leave knowing how to assemble a realistic app slice, run requests through controllers, and replace only the boundaries they intentionally want to control.
 					</aside>
 				</section>
 
@@ -243,7 +424,10 @@
 						Use this as the concrete example for the previous point. A unit test can prove that the service calls sendBatch or that a repository method was invoked. It cannot prove that the event is actually published, consumed, persisted, and then exposed back through the API. This is the gap between intent and working behavior.
 					</aside>
 				</section>
-
+				<section>
+					<h2>The Test Pytamid</h2>
+					<img src="./images/the-testing-pyramid.png" />
+				</section>
 				<section>
 					<h2>Test pyramid vs. modern testing strategy</h2>
 					<ul>
@@ -294,6 +478,292 @@
 				</section>
 
 				<section>
+					<h2>Meeting 1 emphasis</h2>
+					<div class="card-grid">
+						<div class="card">
+							<h3>In scope today</h3>
+							<ul>
+								<li>Nest module wiring</li>
+								<li>Controller + service flow</li>
+								<li>Selective provider overrides</li>
+							</ul>
+						</div>
+						<div class="card">
+							<h3>Later in Meeting 2</h3>
+							<ul>
+								<li>Real database containers</li>
+								<li>Event infrastructure</li>
+								<li>Container lifecycle tradeoffs</li>
+							</ul>
+						</div>
+					</div>
+					<aside class="notes">
+						This prevents the deck from jumping ahead. We still mention the broader testing surface, but the technique students practice today is building a realistic Nest test harness and deciding where mocks belong.
+					</aside>
+				</section>
+
+				<section>
+					<h2>What is a component in Nest.js?</h2>
+					<ul>
+						<li>A <span class="accent">meaningful slice of behavior</span></li>
+						<li>Usually more than one class</li>
+						<li>Often a module, controller, or service with collaborators</li>
+					</ul>
+					<aside class="notes">
+						Define component in a practical way, not dogmatically. In Nest, a component test usually means a controller with pipes, guards, and services wired up, or a service with real framework configuration around it. The key is that we test behavior at a seam users or neighboring systems care about, not just one class in isolation.
+					</aside>
+				</section>
+
+				<section>
+					<h2>Component shapes you will test</h2>
+					<div class="card-grid">
+						<div class="card">
+							<h3>Controller slice</h3>
+							<p>HTTP request, validation, controller, service, response mapping</p>
+						</div>
+						<div class="card">
+							<h3>Service slice</h3>
+							<p>Business logic with repositories, clients, and framework providers</p>
+						</div>
+						<div class="card">
+							<h3>Module slice</h3>
+							<p>Several providers wired together as one feature boundary</p>
+						</div>
+						<div class="card">
+							<h3>Near-E2E slice</h3>
+							<p>Nest app instance plus only a few controlled external seams</p>
+						</div>
+					</div>
+					<aside class="notes">
+						These are the shapes students should recognize in real projects. Near-E2E here means you still exercise the HTTP surface and most application wiring, but you may replace a payment gateway, queue publisher, or upstream REST client.
+					</aside>
+				</section>
+
+				<section>
+					<h2>Unit vs. component: choose by risk</h2>
+					<table>
+						<thead>
+							<tr>
+								<th>Question</th>
+								<th>Prefer unit</th>
+								<th>Prefer component</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Mostly pure logic?</td>
+								<td>Yes</td>
+								<td>No</td>
+							</tr>
+							<tr>
+								<td>Framework wiring matters?</td>
+								<td>No</td>
+								<td>Yes</td>
+							</tr>
+							<tr>
+								<td>Serializer / pipe / guard behavior matters?</td>
+								<td>No</td>
+								<td>Yes</td>
+							</tr>
+							<tr>
+								<td>Mocks would hide the main risk?</td>
+								<td>No</td>
+								<td>Yes</td>
+							</tr>
+						</tbody>
+					</table>
+					<aside class="notes">
+						Give students a decision rule. The more the risk comes from Nest wiring, DTO transformation, interceptors, provider configuration, or collaboration between classes, the more component tests earn their keep. If the value lies in fast feedback on dense branching logic, stay with unit tests.
+					</aside>
+				</section>
+
+				<section>
+					<h2>Examples from a Nest app</h2>
+					<ul>
+						<li><strong>Unit:</strong> map launch status to a display label</li>
+						<li><strong>Component:</strong> <code>GET /launches/:id</code> through controller + service</li>
+						<li><strong>Near-E2E:</strong> create Nest app and issue real HTTP requests</li>
+					</ul>
+					<aside class="notes">
+						Keep the examples concrete. The first is a pure function. The second verifies a useful application slice. The third is what students should be able to assemble with TestingModule: most of the stack running, while replacing only the boundaries they do not want to hit for that test.
+					</aside>
+				</section>
+
+				<section>
+					<h2>TestingModule is the core tool</h2>
+					<ul>
+						<li>Build a Nest app slice in memory</li>
+						<li>Choose which providers are real</li>
+						<li>Override only the seams you want to control</li>
+					</ul>
+					<aside class="notes">
+						This is the transition into the practical section. TestingModule is how we control the realism level. We can compile a feature module, instantiate services directly, or create a full INestApplication and send requests into it.
+					</aside>
+				</section>
+
+				<section>
+					<h2>Typical TestingModule flow</h2>
+					<pre><code class="language-ts">const moduleRef = await Test.createTestingModule({
+  imports: [AppModule],
+})
+  .overrideProvider(Ll2Service)
+  .useValue(mockLl2Service)
+  .compile();
+
+const app = moduleRef.createNestApplication();
+await app.init();</code></pre>
+					<aside class="notes">
+						Walk through the three decisions here: what module to import, what to override, and whether to get a service directly or create a Nest application. Emphasize that the override should target a real seam, not every collaborator by default.
+					</aside>
+				</section>
+
+				<section>
+					<h2>Three ways to use it</h2>
+					<div class="card-grid">
+						<div class="card">
+							<h3>Get a service</h3>
+							<p>Fastest path for service-level component tests</p>
+						</div>
+						<div class="card">
+							<h3>Create an app</h3>
+							<p>Exercise controllers through real HTTP requests</p>
+						</div>
+						<div class="card">
+							<h3>Import a feature module</h3>
+							<p>Keep scope focused instead of booting the whole app</p>
+						</div>
+						<div class="card">
+							<h3>Override a provider</h3>
+							<p>Swap one dependency without destroying the full slice</p>
+						</div>
+					</div>
+					<aside class="notes">
+						Students often learn only one pattern. Show that TestingModule supports a spectrum. They should pick the lightest harness that still exercises the risk they care about.
+					</aside>
+				</section>
+
+				<section>
+					<h2>Selective mocking beats total mocking</h2>
+					<ul>
+						<li>Keep internal wiring real</li>
+						<li>Mock expensive or unstable boundaries</li>
+						<li>Avoid asserting implementation details</li>
+					</ul>
+					<aside class="notes">
+						This is the key mindset. If every dependency is mocked, the test is just a dressed-up unit test. The value comes from keeping controllers, services, pipes, and response shaping real while mocking only the boundary that makes the test slow, flaky, or out of scope.
+					</aside>
+				</section>
+
+				<section>
+					<h2>What to keep real</h2>
+					<ul>
+						<li>Routing, validation, and serialization</li>
+						<li>Feature services and their collaboration</li>
+						<li>Error handling that users actually observe</li>
+					</ul>
+					<aside class="notes">
+						If the test is supposed to tell us whether the app behaves correctly, keep the behavior-producing layers real. This usually includes DTO validation, controller-to-service flow, error mapping, and most provider collaboration inside the feature.
+					</aside>
+				</section>
+
+				<section>
+					<h2>What to mock first</h2>
+					<ul>
+						<li>Upstream HTTP clients</li>
+						<li>Message publishers or external SDKs</li>
+						<li>Anything slow, nondeterministic, or out of scope</li>
+					</ul>
+					<aside class="notes">
+						Explain that mocks are still useful. They are most useful at external seams or side effects we intentionally do not want today. The principle is not anti-mock. The principle is mock at the right boundary.
+					</aside>
+				</section>
+
+				<section>
+					<h2>Controller test pattern</h2>
+					<ul>
+						<li>Import feature module or declare controller + providers</li>
+						<li>Create <code>INestApplication</code></li>
+						<li>Send requests with Supertest</li>
+					</ul>
+					<aside class="notes">
+						This is the pattern for near-E2E checks inside one feature. You are not calling controller methods directly. You want the HTTP surface, framework glue, and response behavior involved.
+					</aside>
+				</section>
+
+				<section>
+					<h2>Service test pattern</h2>
+					<ul>
+						<li>Compile a module with the real service</li>
+						<li>Override only repositories or clients as needed</li>
+						<li>Assert behavior, state changes, and outbound calls</li>
+					</ul>
+					<aside class="notes">
+						This is appropriate when HTTP is not the risk. The service still runs inside Nest DI, so configuration and collaborators are realistic, but the harness is lighter than a full app instance.
+					</aside>
+				</section>
+
+				<section>
+					<h2>Module test pattern</h2>
+					<ul>
+						<li>Import the feature module under test</li>
+						<li>Provide test doubles for external tokens</li>
+						<li>Verify the full feature slice works together</li>
+					</ul>
+					<aside class="notes">
+						Use this when the behavior spans multiple providers inside the feature. It is often the best balance between confidence and setup size.
+					</aside>
+				</section>
+
+				<section>
+					<h2>Common mistakes</h2>
+					<ul>
+						<li>Mocking every provider by habit</li>
+						<li>Calling controller methods directly for HTTP behavior</li>
+						<li>Asserting that mocks were called instead of user-visible outcomes</li>
+					</ul>
+					<aside class="notes">
+						This slide should help reset instincts from unit-testing-heavy teams. A component test should answer whether the slice works, not whether the test author predicted each internal call.
+					</aside>
+				</section>
+
+				<section>
+					<h2>LaunchPad: what students will test</h2>
+					<div class="two-col">
+						<div>
+							<div class="mini-title">Feature surface</div>
+							<ul>
+								<li><code>GET /launches</code></li>
+								<li><code>GET /launches/:id</code></li>
+								<li><code>POST /launches/:id/favorite</code></li>
+							</ul>
+						</div>
+						<div>
+							<div class="mini-title">Key seams</div>
+							<ul>
+								<li>LL2 client</li>
+								<li>Persistence layer</li>
+								<li>Event publishing later</li>
+							</ul>
+						</div>
+					</div>
+					<aside class="notes">
+						Tie the strategy back to the app students will see. For Meeting 1, the immediate value is understanding what the slices are and how TestingModule lets them test those slices realistically before we move into more infrastructure-heavy exercises.
+					</aside>
+				</section>
+
+				<section>
+					<h2>By the end of this meeting</h2>
+					<ul>
+						<li>Recognize when unit tests stop being enough</li>
+						<li>Use <span class="accent">TestingModule</span> to assemble realistic app slices</li>
+						<li>Choose what to keep real and what to mock</li>
+					</ul>
+					<aside class="notes">
+						This is the outcome slide. It matches the user's stated goal closely: students should be effective with TestingModule and able to write near-full E2E style tests or partially mock layers with intention.
+					</aside>
+				</section>
+
+				<section>
 					<h2>How LaunchPad maps to those layers</h2>
 					<ul>
 						<li><code>GET /launches</code> -> LL2 API -> MSW</li>
@@ -310,10 +780,11 @@
 					<ul>
 						<li>Unit tests are necessary, not sufficient</li>
 						<li><span class="accent">Component tests</span> add realistic confidence</li>
-						<li>We will test API, DB, and messaging boundaries</li>
+						<li>TestingModule is how we control realism in Nest</li>
+						<li>Meeting 2 adds infrastructure realism on top of this foundation</li>
 					</ul>
 					<aside class="notes">
-						Close by reinforcing the three requested ideas. Unit tests are necessary but do not validate behavior across real boundaries. Modern backend strategy gives component tests a central role. In this course, those boundaries are external APIs, databases, and messaging systems. Transition from here into Nest TestingModule and setup patterns.
+						Close by reinforcing the three requested ideas. Unit tests are necessary but do not validate behavior across real boundaries. Modern backend strategy gives component tests a central role. The practical skill students leave with today is using TestingModule to build realistic Nest test harnesses and deciding where mocks should live.
 					</aside>
 				</section>
 			</div>

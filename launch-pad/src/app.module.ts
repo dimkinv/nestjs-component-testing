@@ -1,14 +1,20 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { Ll2Service } from './ll2.service';
+import { FavouritesController } from './favourites.controller';
 import {
   FavoriteLaunch,
   FavoriteLaunchSchema,
+  FavouritesService,
+} from './favourites.service';
+import { Ll2Service } from './ll2.service';
+import {
+  LaunchesController,
+} from './launches.controller';
+import {
   LaunchMilestoneEvent,
   LaunchMilestoneEventSchema,
-} from './app.service';
+  LaunchesService,
+} from './launches.service';
 
 @Module({
   imports: [
@@ -20,7 +26,7 @@ import {
       { name: LaunchMilestoneEvent.name, schema: LaunchMilestoneEventSchema },
     ]),
   ],
-  controllers: [AppController],
-  providers: [AppService, Ll2Service],
+  controllers: [LaunchesController, FavouritesController],
+  providers: [LaunchesService, FavouritesService, Ll2Service],
 })
 export class AppModule {}
