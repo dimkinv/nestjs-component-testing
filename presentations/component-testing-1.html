@@ -99,6 +99,33 @@
 				font-size: 0.62em;
 			}
 
+			.reveal .example-card {
+				padding: 0.7em 0.85em;
+				border: 1px solid rgba(255, 255, 255, 0.12);
+				border-radius: 18px;
+				background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+				margin-top: 0.8em;
+			}
+
+			.reveal .example-card h3 {
+				font-size: 0.68em;
+				margin-bottom: 0.3em;
+			}
+
+			.reveal .example-card p {
+				font-size: 0.5em;
+				margin: 0 0 0.4em;
+			}
+
+			.reveal .example-card pre {
+				margin: 0;
+			}
+
+			.reveal .example-card pre code {
+				font-size: 0.48em;
+				line-height: 1.25;
+			}
+
 			.reveal .two-col {
 				display: grid;
 				grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -390,18 +417,6 @@
 				</section>
 
 				<section>
-					<h2>Meeting 1 boundary</h2>
-					<ul>
-						<li>No infrastructure containers yet</li>
-						<li>Focus on <span class="accent">application wiring</span> inside Nest</li>
-						<li>Goal: write near-E2E tests with controlled seams</li>
-					</ul>
-					<aside class="notes">
-						Set expectations explicitly. Today is about becoming effective with Nest's testing primitives. Students should leave knowing how to assemble a realistic app slice, run requests through controllers, and replace only the boundaries they intentionally want to control.
-					</aside>
-				</section>
-
-				<section>
 					<h2>Why unit tests are not enough</h2>
 					<ul>
 						<li>Great for logic in isolation</li>
@@ -423,10 +438,6 @@
 					<aside class="notes">
 						Use this as the concrete example for the previous point. A unit test can prove that the service calls sendBatch or that a repository method was invoked. It cannot prove that the event is actually published, consumed, persisted, and then exposed back through the API. This is the gap between intent and working behavior.
 					</aside>
-				</section>
-				<section>
-					<h2>The Test Pytamid</h2>
-					<img src="./images/the-testing-pyramid.png" />
 				</section>
 				<section>
 					<h2>Test pyramid vs. modern testing strategy</h2>
@@ -453,31 +464,6 @@
 				</section>
 
 				<section>
-					<h2>A practical balance for Nest.js services</h2>
-					<ul>
-						<li>Unit: fast feedback on logic</li>
-						<li>Component: main confidence layer</li>
-						<li>Integration/E2E: critical paths only</li>
-					</ul>
-					<aside class="notes">
-						If you want to elaborate, unit tests are best for pure logic and branching. Component tests are best for module-level behavior with real infrastructure boundaries. Integration or end-to-end tests are best for a few critical production flows and contract verification. For this course, component tests are the center of gravity.
-					</aside>
-				</section>
-
-				<section>
-					<h2>Different layers of component tests</h2>
-					<ul>
-						<li>API layer</li>
-						<li>Database layer</li>
-						<li>Messaging layer</li>
-						<li>External-service boundary</li>
-					</ul>
-					<aside class="notes">
-						API layer means exercising the Nest controller and service while replacing the upstream HTTP dependency with a realistic mock server. Database layer means running against a real PostgreSQL container so entities, repositories, and persistence behavior are tested together. Messaging layer means publishing and consuming real events through the Event Hub emulator. External-service boundary means controlling upstream responses precisely to test retries, mapping, and error handling.
-					</aside>
-				</section>
-
-				<section>
 					<h2>Meeting 1 emphasis</h2>
 					<div class="card-grid">
 						<div class="card">
@@ -499,6 +485,18 @@
 					</div>
 					<aside class="notes">
 						This prevents the deck from jumping ahead. We still mention the broader testing surface, but the technique students practice today is building a realistic Nest test harness and deciding where mocks belong.
+					</aside>
+				</section>
+
+				<section>
+					<h2>A practical balance for Nest.js services</h2>
+					<ul>
+						<li>Unit: fast feedback on logic</li>
+						<li>Component: main confidence layer</li>
+						<li>Integration/E2E: critical paths only</li>
+					</ul>
+					<aside class="notes">
+						If you want to elaborate, unit tests are best for pure logic and branching. Component tests are best for module-level behavior with real infrastructure boundaries. Integration or end-to-end tests are best for a few critical production flows and contract verification. For this course, component tests are the center of gravity.
 					</aside>
 				</section>
 
@@ -618,7 +616,7 @@ await app.init();</code></pre>
 				</section>
 
 				<section>
-					<h2>Three ways to use it</h2>
+					<h2>Four ways to use it</h2>
 					<div class="card-grid">
 						<div class="card">
 							<h3>Get a service</h3>
@@ -643,6 +641,75 @@ await app.init();</code></pre>
 				</section>
 
 				<section>
+					<h2>Example: get a service</h2>
+					<div class="example-card">
+						<h3>TestingModule only wires DI</h3>
+						<p>Compile DI, then get one provider.</p>
+						<pre><code class="language-ts">const moduleRef = await Test.createTestingModule({
+  providers: [LaunchesService, Ll2Service],
+}).compile();
+
+const service = moduleRef.get(LaunchesService);
+await expect(service.findAll()).resolves.toHaveLength(3);</code></pre>
+					</div>
+					<aside class="notes">
+						This is the lightest harness. The important point is that the TestingModule stops at DI compilation and we pull the service directly, so there is no Nest application instance and no HTTP surface involved.
+					</aside>
+				</section>
+
+				<section>
+					<h2>Example: create an app</h2>
+					<div class="example-card">
+						<h3>Same module, plus HTTP surface</h3>
+						<p>Turn the module into an HTTP app.</p>
+						<pre><code class="language-ts">const moduleRef = await Test.createTestingModule({
+  imports: [LaunchesModule],
+}).compile();
+
+const app = moduleRef.createNestApplication();
+await app.init();
+await request(app.getHttpServer()).get('/launches').expect(200);</code></pre>
+					</div>
+					<aside class="notes">
+						The compile step is the same shape, but now we continue into createNestApplication because the controller, routing, and response behavior are part of what we want to verify.
+					</aside>
+				</section>
+
+				<section>
+					<h2>Example: import a feature module</h2>
+					<div class="example-card">
+						<h3>Narrow the slice up front</h3>
+						<p>Boot only the feature under test.</p>
+						<pre><code class="language-ts">const moduleRef = await Test.createTestingModule({
+  imports: [FavouritesModule],
+}).compile();
+
+const service = moduleRef.get(FavouritesService);
+await service.add('falcon-9');</code></pre>
+					</div>
+					<aside class="notes">
+						Here the key decision happens before compilation: import only the feature module instead of AppModule. That keeps the test fast and focused without changing how we access providers afterwards.
+					</aside>
+				</section>
+
+				<section>
+					<h2>Example: override a provider</h2>
+					<div class="example-card">
+						<h3>Swap one external seam</h3>
+						<p>Keep the slice real, change one dependency.</p>
+						<pre><code class="language-ts">const moduleRef = await Test.createTestingModule({
+  imports: [LaunchesModule],
+})
+  .overrideProvider(Ll2Service)
+  .useValue({ findAll: jest.fn().mockResolvedValue([mockLaunch]) })
+  .compile();</code></pre>
+					</div>
+					<aside class="notes">
+						This example changes the module after createTestingModule but before compile. That is the mental model to reinforce: same feature slice, one provider swapped so the test controls an external boundary without mocking everything else.
+					</aside>
+				</section>
+
+				<section>
 					<h2>Selective mocking beats total mocking</h2>
 					<ul>
 						<li>Keep internal wiring real</li>
@@ -655,26 +722,14 @@ await app.init();</code></pre>
 				</section>
 
 				<section>
-					<h2>What to keep real</h2>
+					<h2>Where to keep real behavior vs. where to mock</h2>
 					<ul>
-						<li>Routing, validation, and serialization</li>
-						<li>Feature services and their collaboration</li>
-						<li>Error handling that users actually observe</li>
+						<li>Keep routing, validation, serialization, and feature services real</li>
+						<li>Mock upstream HTTP clients, publishers, and unstable SDKs first</li>
+						<li>Assert user-visible outcomes more than internal calls</li>
 					</ul>
 					<aside class="notes">
-						If the test is supposed to tell us whether the app behaves correctly, keep the behavior-producing layers real. This usually includes DTO validation, controller-to-service flow, error mapping, and most provider collaboration inside the feature.
-					</aside>
-				</section>
-
-				<section>
-					<h2>What to mock first</h2>
-					<ul>
-						<li>Upstream HTTP clients</li>
-						<li>Message publishers or external SDKs</li>
-						<li>Anything slow, nondeterministic, or out of scope</li>
-					</ul>
-					<aside class="notes">
-						Explain that mocks are still useful. They are most useful at external seams or side effects we intentionally do not want today. The principle is not anti-mock. The principle is mock at the right boundary.
+						Keep the behavior-producing layers real. That usually includes DTO validation, controller-to-service flow, error mapping, and most provider collaboration inside the feature. Mock external seams or side effects you intentionally do not want today. The principle is not anti-mock; it is mock at the right boundary and keep assertions focused on observable behavior.
 					</aside>
 				</section>
 
@@ -691,26 +746,14 @@ await app.init();</code></pre>
 				</section>
 
 				<section>
-					<h2>Service test pattern</h2>
+					<h2>Service or module test pattern</h2>
 					<ul>
-						<li>Compile a module with the real service</li>
-						<li>Override only repositories or clients as needed</li>
-						<li>Assert behavior, state changes, and outbound calls</li>
+						<li>Compile a module with the real providers you care about</li>
+						<li>Override only repositories, clients, or external tokens as needed</li>
+						<li>Verify the slice works together before asserting outbound details</li>
 					</ul>
 					<aside class="notes">
-						This is appropriate when HTTP is not the risk. The service still runs inside Nest DI, so configuration and collaborators are realistic, but the harness is lighter than a full app instance.
-					</aside>
-				</section>
-
-				<section>
-					<h2>Module test pattern</h2>
-					<ul>
-						<li>Import the feature module under test</li>
-						<li>Provide test doubles for external tokens</li>
-						<li>Verify the full feature slice works together</li>
-					</ul>
-					<aside class="notes">
-						Use this when the behavior spans multiple providers inside the feature. It is often the best balance between confidence and setup size.
+						Use this when HTTP is not the main risk or when behavior spans several providers inside the feature. It is often the best balance between confidence and setup size because Nest DI and configuration stay realistic while the harness remains lighter than a full app instance.
 					</aside>
 				</section>
 
