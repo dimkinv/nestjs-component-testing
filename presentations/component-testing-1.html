@@ -126,6 +126,14 @@
 				line-height: 1.25;
 			}
 
+			.reveal .exercise-path {
+				font-size: 0.44em;
+				font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+				color: var(--accent-warm);
+				margin-top: 0.45em;
+				word-break: break-word;
+			}
+
 			.reveal .two-col {
 				display: grid;
 				grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -651,6 +659,7 @@ await app.init();</code></pre>
 
 const service = moduleRef.get(LaunchesService);
 await expect(service.findAll()).resolves.toHaveLength(3);</code></pre>
+						<p class="exercise-path">Exercise: src/tests-exercises/get-a-service.exercise.spec.ts</p>
 					</div>
 					<aside class="notes">
 						This is the lightest harness. The important point is that the TestingModule stops at DI compilation and we pull the service directly, so there is no Nest application instance and no HTTP surface involved.
@@ -669,6 +678,7 @@ await expect(service.findAll()).resolves.toHaveLength(3);</code></pre>
 const app = moduleRef.createNestApplication();
 await app.init();
 await request(app.getHttpServer()).get('/launches').expect(200);</code></pre>
+						<p class="exercise-path">Exercise: src/tests-exercises/create-an-app.exercise.spec.ts</p>
 					</div>
 					<aside class="notes">
 						The compile step is the same shape, but now we continue into createNestApplication because the controller, routing, and response behavior are part of what we want to verify.
@@ -686,6 +696,7 @@ await request(app.getHttpServer()).get('/launches').expect(200);</code></pre>
 
 const service = moduleRef.get(FavouritesService);
 await service.add('falcon-9');</code></pre>
+						<p class="exercise-path">Exercise: src/tests-exercises/import-a-feature-module.exercise.spec.ts</p>
 					</div>
 					<aside class="notes">
 						Here the key decision happens before compilation: import only the feature module instead of AppModule. That keeps the test fast and focused without changing how we access providers afterwards.
@@ -703,6 +714,7 @@ await service.add('falcon-9');</code></pre>
   .overrideProvider(Ll2Service)
   .useValue({ findAll: jest.fn().mockResolvedValue([mockLaunch]) })
   .compile();</code></pre>
+						<p class="exercise-path">Exercise: src/tests-exercises/override-a-provider.exercise.spec.ts</p>
 					</div>
 					<aside class="notes">
 						This example changes the module after createTestingModule but before compile. That is the mental model to reinforce: same feature slice, one provider swapped so the test controls an external boundary without mocking everything else.
