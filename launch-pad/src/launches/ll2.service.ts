@@ -51,8 +51,7 @@ export class Ll2Service {
   private readonly logger = new Logger(Ll2Service.name);
   private readonly ll2ApiBaseUrl =
     process.env.LL2_BASE_URL ?? 'https://ll.thespacedevs.com/2.3.0';
-  private readonly ll2ProxyUrl =
-    process.env.LL2_PROXY_URL ?? 'http://cso.proxy.att.com:8888';
+  private readonly ll2ProxyUrl = process.env.LL2_PROXY_URL;
   private readonly ll2ProxyAgent = this.ll2ProxyUrl
     ? new ProxyAgent(this.ll2ProxyUrl)
     : undefined;
