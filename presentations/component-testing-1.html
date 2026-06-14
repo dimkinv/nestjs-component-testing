@@ -373,22 +373,6 @@
 				</section>
 
 				<section>
-					<h4>Super Fast Orbital Mechanics Intro by kerbals</h4>
-					<img
-						style="height: 150px; background-size: contain; position: absolute; left: 20px; transform: rotate(30deg)"
-						src="./images/kerbal1.png"
-						alt="Kerbal character"
-					/>
-					<img
-						style="height: 150px; background-size: contain; position: absolute; right: 20px; transform: rotate(-145deg)"
-						src="./images/kerbal2.webp"
-						alt="Kerbal character"
-					/>
-					<p>Types of orbits</p>
-					<img src="./images/orbits.jpeg" alt="Orbit types" />
-				</section>
-
-				<section>
 					<h3>So why to test anyway?</h3>
 					<div style="display: flex; justify-content: center">
 						<div class="fragment" style="margin-right: 20px">
@@ -486,11 +470,10 @@
 				<section>
 					<h2>Today&apos;s focus</h2>
 					<ul>
-						<li>Why unit tests are not enough</li>
 						<li>UT + component + integration</li>
 						<li>What a component means in Nest.js</li>
 						<li>TestingModule and selective mocking</li>
-						<li>Map it to LaunchPad</li>
+						<li>Map it to LaunchPad demo project</li>
 					</ul>
 					<aside class="notes">
 						Keep this as the agenda slide. The purpose is to orient the room, not explain each item yet.
@@ -499,73 +482,32 @@
 
 				<section>
 					<h2>Why unit tests are not enough</h2>
-					<ul>
-						<li>Great for logic in isolation</li>
-						<li>Weak at integration seams</li>
-						<li>Mocks can hide real failures</li>
-					</ul>
+					<div class="fragment">
+						<ul>
+							<li>Weak at integration seams</li>
+							<li>Mocks can hide real failures</li>
+						</ul>
+					</div>
 					<aside class="notes">
 						Unit tests are still valuable. They are excellent for branching logic, pure transformations, and local error handling. The limit is that production failures often happen where modules, frameworks, serializers, ORMs, and external systems meet. Typical examples: wrong provider wiring in Nest, validation and serialization mismatches, ORM mapping issues, and stale assumptions about external API contracts.
 					</aside>
 				</section>
 
 				<section>
-					<h2>LaunchPad example</h2>
+					<h2>LaunchPad as an Example</h2>
 					<ul>
-						<li><code>POST /launches/:id/simulate</code></li>
-						<li>controller -> service -> Event Hub</li>
-						<li>consumer -> DB -> read API</li>
+						<li><code>POST /launches/:id/favorite</code></li>
+						<li>controller -> service -> persistence layer</li>
 					</ul>
 					<aside class="notes">
-						Use this as the concrete example for the previous point. A unit test can prove that the service calls sendBatch or that a repository method was invoked. It cannot prove that the event is actually published, consumed, persisted, and then exposed back through the API. This is the gap between intent and working behavior.
+						Use this as the concrete example for the previous point. A unit test can prove that the service calls a repository method or builds the expected payload. It cannot prove that a favorite is actually persisted and then exposed again through the read API. This is the gap between intent and working behavior.
 					</aside>
 				</section>
 				<section>
-					<h2>Test pyramid vs. modern testing strategy</h2>
-					<ul>
-						<li>Classic: mostly unit tests</li>
-						<li>Modern: unit + component + integration</li>
-						<li><span class="accent">Component tests carry more confidence</span></li>
-					</ul>
+					<h2>Testing Pyramid</h2>
+					<img src="./images/the-testing-pyramid.png" alt="Testing pyramid" />
 					<aside class="notes">
-						The classic pyramid was a useful correction against expensive UI-heavy end-to-end suites. For backend services, the main shift is not abandoning unit tests but recognizing that many defects live in realistic module and infrastructure interactions. So a practical modern strategy uses unit tests for tight logic loops, component tests as the main confidence layer, and targeted integration or end-to-end coverage for critical flows.
-					</aside>
-				</section>
-
-				<section>
-					<h2>Why the strategy changed</h2>
-					<ul>
-						<li>Backends are integration-heavy</li>
-						<li>Mocks are easy to overuse</li>
-						<li>Containers made realism cheaper</li>
-					</ul>
-					<aside class="notes">
-						Expand here on why teams changed practice: services spend much of their time talking to databases, queues, SDKs, and upstream APIs; mocks are fast but can become self-fulfilling; and tools like Testcontainers reduced the cost of running realistic infrastructure in local development and CI. The real goal is confidence, not maximizing the count of tests.
-					</aside>
-				</section>
-
-				<section>
-					<h2>Meeting 1 emphasis</h2>
-					<div class="card-grid">
-						<div class="card">
-							<h3>In scope today</h3>
-							<ul>
-								<li>Nest module wiring</li>
-								<li>Controller + service flow</li>
-								<li>Selective provider overrides</li>
-							</ul>
-						</div>
-						<div class="card">
-							<h3>Later in Meeting 2</h3>
-							<ul>
-								<li>Real database containers</li>
-								<li>Event infrastructure</li>
-								<li>Container lifecycle tradeoffs</li>
-							</ul>
-						</div>
-					</div>
-					<aside class="notes">
-						This prevents the deck from jumping ahead. We still mention the broader testing surface, but the technique students practice today is building a realistic Nest test harness and deciding where mocks belong.
+						Use the classic testing pyramid here as a quick visual reminder. Keep the explanation short and use it mainly to transition into why this course gives more weight to realistic component tests in Nest.
 					</aside>
 				</section>
 
@@ -896,6 +838,24 @@ const moduleRef = await Test.createTestingModule({
 				</section>
 
 				<section>
+					<h2>Supertest 101</h2>
+					<div class="example-card">
+						<p>Supertest is a small library for making assertions against your HTTP server in tests.</p>
+						<pre><code class="language-ts">import request from 'supertest';
+
+const app = moduleRef.createNestApplication();
+await app.init();
+
+await request(app.getHttpServer())
+  .get('/launches')
+  .expect(200)</code></pre>
+					</div>
+					<aside class="notes">
+						Keep this slide practical. Supertest sends real HTTP requests into the Nest app instance and lets us assert on status codes, headers, and response bodies.
+					</aside>
+				</section>
+
+				<section>
 					<h2>Service or module test pattern</h2>
 					<ul>
 						<li>Compile a module with the real providers you care about</li>
@@ -915,56 +875,7 @@ const moduleRef = await Test.createTestingModule({
 						<li>Asserting that mocks were called instead of user-visible outcomes</li>
 					</ul>
 					<aside class="notes">
-						This slide should help reset instincts from unit-testing-heavy teams. A component test should answer whether the slice works, not whether the test author predicted each internal call.
-					</aside>
-				</section>
-
-				<section>
-					<h2>LaunchPad: what students will test</h2>
-					<div class="two-col">
-						<div>
-							<div class="mini-title">Feature surface</div>
-							<ul>
-								<li><code>GET /launches</code></li>
-								<li><code>GET /launches/:id</code></li>
-								<li><code>POST /launches/:id/favorite</code></li>
-							</ul>
-						</div>
-						<div>
-							<div class="mini-title">Key seams</div>
-							<ul>
-								<li>LL2 client</li>
-								<li>Persistence layer</li>
-								<li>Event publishing later</li>
-							</ul>
-						</div>
-					</div>
-					<aside class="notes">
-						Tie the strategy back to the app students will see. For Meeting 1, the immediate value is understanding what the slices are and how TestingModule lets them test those slices realistically before we move into more infrastructure-heavy exercises.
-					</aside>
-				</section>
-
-				<section>
-					<h2>By the end of this meeting</h2>
-					<ul>
-						<li>Recognize when unit tests stop being enough</li>
-						<li>Use <span class="accent">TestingModule</span> to assemble realistic app slices</li>
-						<li>Choose what to keep real and what to mock</li>
-					</ul>
-					<aside class="notes">
-						This is the outcome slide. It matches the user's stated goal closely: students should be effective with TestingModule and able to write near-full E2E style tests or partially mock layers with intention.
-					</aside>
-				</section>
-
-				<section>
-					<h2>How LaunchPad maps to those layers</h2>
-					<ul>
-						<li><code>GET /launches</code> -> LL2 API -> MSW</li>
-						<li><code>POST /favorite</code> -> PostgreSQL -> Testcontainers</li>
-						<li><code>POST /simulate</code> -> Event Hub -> containers</li>
-					</ul>
-					<aside class="notes">
-						Spell out the full mapping here. GET /launches and GET /launches/:id exercise the external LL2 API boundary with MSW. POST /launches/:id/favorite and GET /favorites exercise PostgreSQL persistence with Testcontainers. POST /launches/:id/simulate plus GET /launches/:id/events exercise Azure Event Hub messaging with GenericContainer-based infrastructure.
+						This slide should help reset instincts from unit-testing-heavy teams. Calling the controller directly skips the real Nest HTTP pipeline. Mock-call assertions check internals; prefer responses, saved data, or other user-visible outcomes. A component test should answer whether the slice works, not whether the test author predicted each internal call.
 					</aside>
 				</section>
 
