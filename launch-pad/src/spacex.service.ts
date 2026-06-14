@@ -8,7 +8,7 @@ import {
   type Response as UndiciResponse,
   ProxyAgent,
 } from 'undici';
-import type { LaunchDetails, LaunchSummary } from './launches.types';
+import type { LaunchDetails, LaunchSummary } from './launches/launches.types';
 
 interface Ll2LaunchListResponse {
   results: Ll2Launch[];

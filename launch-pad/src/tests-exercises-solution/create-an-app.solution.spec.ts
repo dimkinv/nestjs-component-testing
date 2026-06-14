@@ -1,27 +1,12 @@
-import { INestApplication, Module } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { App } from 'supertest/types';
-import { LaunchMilestoneEvent, LaunchesService } from '../launches.service';
-import { LaunchesController } from '../launches.controller';
-import { Ll2Service } from '../ll2.service';
-import type { LaunchSummary } from '../launches.types';
-
-const launchMilestoneEventModelMock = {};
-
-@Module({
-  controllers: [LaunchesController],
-  providers: [
-    LaunchesService,
-    Ll2Service,
-    {
-      provide: getModelToken(LaunchMilestoneEvent.name),
-      useValue: launchMilestoneEventModelMock,
-    },
-  ],
-})
-class LaunchesFeatureModule {}
+import { LaunchesModule } from '../launches/launches.module';
+import { LaunchMilestoneEvent } from '../launches/launches.service';
+import { Ll2Service } from '../launches/ll2.service';
+import type { LaunchSummary } from '../launches/launches.types';
 
 describe('TestingModule solution: create an app', () => {
   let moduleRef: TestingModule;
@@ -34,10 +19,12 @@ describe('TestingModule solution: create an app', () => {
     };
 
     moduleRef = await Test.createTestingModule({
-      imports: [LaunchesFeatureModule],
+      imports: [LaunchesModule],
     })
       .overrideProvider(Ll2Service)
       .useValue(ll2ServiceMock)
+      .overrideProvider(getModelToken(LaunchMilestoneEvent.name))
+      .useValue({})
       .compile();
 
     app = moduleRef.createNestApplication();

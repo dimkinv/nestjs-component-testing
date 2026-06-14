@@ -1,7 +1,8 @@
 describe('TestingModule exercise: get a service', () => {
   it.skip('gets LaunchesService from a compiled TestingModule and calls getLaunches', async () => {
     // Import Test from @nestjs/testing.
-    // Import LaunchesService and Ll2Service from the src folder.
+    // Import LaunchesService from ../launches/launches.service.
+    // Import Ll2Service from ../launches/ll2.service.
     // Build a TestingModule with providers: [LaunchesService, Ll2Service].
     // Compile the module, then get LaunchesService from moduleRef.
     // Call service.getLaunches().

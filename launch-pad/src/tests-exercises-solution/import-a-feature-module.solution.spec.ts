@@ -1,26 +1,14 @@
-import { Module } from '@nestjs/common';
-import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
+import { getModelToken } from '@nestjs/mongoose';
+import { FavouritesModule } from '../favourites/favourites.module';
 import {
   FavoriteLaunch,
   FavouritesService,
-} from '../favourites.service';
+} from '../favourites/favourites.service';
 
 const favoriteLaunchModelMock = {
   find: jest.fn(),
 };
-
-@Module({
-  providers: [
-    FavouritesService,
-    {
-      provide: getModelToken(FavoriteLaunch.name),
-      useValue: favoriteLaunchModelMock,
-    },
-  ],
-  exports: [FavouritesService],
-})
-class FavouritesFeatureModule {}
 
 describe('TestingModule solution: import a feature module', () => {
   let moduleRef: TestingModule;
@@ -40,8 +28,11 @@ describe('TestingModule solution: import a feature module', () => {
     });
 
     moduleRef = await Test.createTestingModule({
-      imports: [FavouritesFeatureModule],
-    }).compile();
+      imports: [FavouritesModule],
+    })
+      .overrideProvider(getModelToken(FavoriteLaunch.name))
+      .useValue(favoriteLaunchModelMock)
+      .compile();
 
     favouritesService = moduleRef.get(FavouritesService);
     jest.clearAllMocks();

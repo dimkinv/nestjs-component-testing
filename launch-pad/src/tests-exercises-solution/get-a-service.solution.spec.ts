@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
-import { LaunchMilestoneEvent, LaunchesService } from '../launches.service';
-import { Ll2Service } from '../ll2.service';
-import type { LaunchSummary } from '../launches.types';
+import { LaunchMilestoneEvent, LaunchesService } from '../launches/launches.service';
+import { Ll2Service } from '../launches/ll2.service';
+import type { LaunchSummary } from '../launches/launches.types';
 
 describe('TestingModule solution: get a service', () => {
   let moduleRef: TestingModule;

@@ -1,24 +1,9 @@
-import { Module } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import { LaunchMilestoneEvent, LaunchesService } from '../launches.service';
-import { Ll2Service } from '../ll2.service';
-import type { LaunchSummary } from '../launches.types';
-
-const launchMilestoneEventModelMock = {};
-
-@Module({
-  providers: [
-    LaunchesService,
-    Ll2Service,
-    {
-      provide: getModelToken(LaunchMilestoneEvent.name),
-      useValue: launchMilestoneEventModelMock,
-    },
-  ],
-  exports: [LaunchesService],
-})
-class LaunchesFeatureModule {}
+import { LaunchesModule } from '../launches/launches.module';
+import { LaunchMilestoneEvent, LaunchesService } from '../launches/launches.service';
+import { Ll2Service } from '../launches/ll2.service';
+import type { LaunchSummary } from '../launches/launches.types';
 
 describe('TestingModule solution: override a provider', () => {
   let moduleRef: TestingModule;
@@ -31,10 +16,12 @@ describe('TestingModule solution: override a provider', () => {
     };
 
     moduleRef = await Test.createTestingModule({
-      imports: [LaunchesFeatureModule],
+      imports: [LaunchesModule],
     })
       .overrideProvider(Ll2Service)
       .useValue(ll2ServiceMock)
+      .overrideProvider(getModelToken(LaunchMilestoneEvent.name))
+      .useValue({})
       .compile();
 
     launchesService = moduleRef.get(LaunchesService);
