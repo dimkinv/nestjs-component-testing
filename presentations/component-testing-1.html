@@ -624,6 +624,7 @@
 
 				<section>
 					<h2>Typical TestingModule flow</h2>
+					<div class="card">
 					<pre><code class="language-ts">const moduleRef = await Test.createTestingModule({
   imports: [AppModule],
 })
@@ -633,6 +634,7 @@
 
 const app = moduleRef.createNestApplication();
 await app.init();</code></pre>
+</div>
 					<aside class="notes">
 						Walk through the three decisions here: what module to import, what to override, and whether to get a service directly or create a Nest application. Emphasize that the override should target a real seam, not every collaborator by default.
 					</aside>
@@ -665,7 +667,7 @@ await app.init();</code></pre>
 
 				<section>
 					<h2>Example: get a service</h2>
-					<div class="example-card">
+					<div class="card">
 						<h3>TestingModule only wires DI</h3>
 						<p>Compile DI, then get one provider.</p>
 						<pre><code class="language-ts">import { Test } from '@nestjs/testing';
@@ -687,7 +689,7 @@ await expect(service.findAll()).resolves.toHaveLength(3);</code></pre>
 
 				<section>
 					<h2>Example: create an app</h2>
-					<div class="example-card">
+					<div class="card">
 						<h3>Same module, plus HTTP surface</h3>
 						<p>Turn the module into an HTTP app.</p>
 						<pre><code class="language-ts">import { Test } from '@nestjs/testing';
@@ -759,7 +761,7 @@ const launchMilestoneEventModelMock = {};
 
 				<section>
 					<h2>Example: import a feature module</h2>
-					<div class="example-card">
+					<div class="card">
 						<h3>Narrow the slice up front</h3>
 						<p>Boot only the feature under test.</p>
 						<pre><code class="language-ts">import { Test } from '@nestjs/testing';
@@ -781,7 +783,7 @@ await service.add('falcon-9');</code></pre>
 
 				<section>
 					<h2>Example: override a provider</h2>
-					<div class="example-card">
+					<div class="card">
 						<h3>Swap one external seam</h3>
 						<p>Keep the slice real, change one dependency.</p>
 						<pre><code class="language-ts">import { Test } from '@nestjs/testing';
@@ -839,7 +841,7 @@ const moduleRef = await Test.createTestingModule({
 
 				<section>
 					<h2>Supertest 101</h2>
-					<div class="example-card">
+					<div class="card">
 						<p>Supertest is a small library for making assertions against your HTTP server in tests.</p>
 						<pre><code class="language-ts">import request from 'supertest';
 
@@ -852,6 +854,24 @@ await request(app.getHttpServer())
 					</div>
 					<aside class="notes">
 						Keep this slide practical. Supertest sends real HTTP requests into the Nest app instance and lets us assert on status codes, headers, and response bodies.
+					</aside>
+				</section>
+
+				<section>
+					<h2>Supertest 101 - continue</h2>
+					<div class="card">
+						<p>Common assertions check status, headers, and response body.</p>
+						<pre><code class="language-ts">await request(app.getHttpServer())
+  .post('/launches/falcon-9/favorite')
+  .set('x-user-id', 'user-1')
+  .expect(201)
+  .expect('Content-Type', /json/)
+  .expect(({ body }) => {
+    expect(body.data.launchId).toBe('falcon-9');
+  });</code></pre>
+					</div>
+					<aside class="notes">
+						Show the three common categories: status code, header, and body assertion. Keep it concrete and avoid listing every API shape.
 					</aside>
 				</section>
 
