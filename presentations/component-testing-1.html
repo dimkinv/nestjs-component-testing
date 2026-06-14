@@ -134,6 +134,79 @@
 				word-break: break-word;
 			}
 
+			.reveal .explain-grid {
+				display: grid;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				gap: 0.7em;
+				margin-top: 0.8em;
+			}
+
+			.reveal .explain-card {
+				padding: 0.55em 0.7em;
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				border-radius: 14px;
+				background: rgba(255, 255, 255, 0.04);
+			}
+
+			.reveal .explain-card h3 {
+				font-size: 0.52em;
+				margin-bottom: 0.25em;
+				color: var(--accent-warm);
+			}
+
+			.reveal .explain-card p {
+				font-size: 0.44em;
+				margin: 0;
+				line-height: 1.35;
+			}
+
+			.reveal .mongoose-slide .mongoose-layout {
+				display: grid;
+				grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+				gap: 0.7em;
+				align-items: start;
+				margin-top: 0.6em;
+			}
+
+			.reveal .mongoose-slide .example-card {
+				margin-top: 0;
+				padding: 0.6em 0.72em;
+			}
+
+			.reveal .mongoose-slide .example-card h3 {
+				font-size: 0.6em;
+			}
+
+			.reveal .mongoose-slide .example-card p {
+				font-size: 0.44em;
+				margin-bottom: 0.3em;
+			}
+
+			.reveal .mongoose-slide .example-card pre code {
+				font-size: 0.4em;
+				line-height: 1.18;
+			}
+
+			.reveal .mongoose-slide .explain-grid {
+				grid-template-columns: 1fr;
+				gap: 0.45em;
+				margin-top: 0;
+			}
+
+			.reveal .mongoose-slide .explain-card {
+				padding: 0.4em 0.52em;
+			}
+
+			.reveal .mongoose-slide .explain-card h3 {
+				font-size: 0.44em;
+				margin-bottom: 0.16em;
+			}
+
+			.reveal .mongoose-slide .explain-card p {
+				font-size: 0.36em;
+				line-height: 1.22;
+			}
+
 			.reveal .two-col {
 				display: grid;
 				grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -653,7 +726,11 @@ await app.init();</code></pre>
 					<div class="example-card">
 						<h3>TestingModule only wires DI</h3>
 						<p>Compile DI, then get one provider.</p>
-						<pre><code class="language-ts">const moduleRef = await Test.createTestingModule({
+						<pre><code class="language-ts">import { Test } from '@nestjs/testing';
+import { LaunchesService } from './launches.service';
+import { Ll2Service } from './ll2.service';
+
+const moduleRef = await Test.createTestingModule({
   providers: [LaunchesService, Ll2Service],
 }).compile();
 
@@ -671,7 +748,11 @@ await expect(service.findAll()).resolves.toHaveLength(3);</code></pre>
 					<div class="example-card">
 						<h3>Same module, plus HTTP surface</h3>
 						<p>Turn the module into an HTTP app.</p>
-						<pre><code class="language-ts">const moduleRef = await Test.createTestingModule({
+						<pre><code class="language-ts">import { Test } from '@nestjs/testing';
+import request from 'supertest';
+import { LaunchesModule } from './launches.module';
+
+const moduleRef = await Test.createTestingModule({
   imports: [LaunchesModule],
 }).compile();
 
@@ -685,12 +766,65 @@ await request(app.getHttpServer()).get('/launches').expect(200);</code></pre>
 					</aside>
 				</section>
 
+				<section class="mongoose-slide">
+					<h2>Why mock Mongoose here?</h2>
+					<div class="mongoose-layout">
+						<div class="example-card">
+							<h3>Nest must resolve every constructor dependency</h3>
+							<p>Even if this test only calls <code>GET /launches</code>, <code>LaunchesService</code> still depends on a Mongoose model.</p>
+							<pre><code class="language-ts">import { Module } from '@nestjs/common';
+import { getModelToken } from '@nestjs/mongoose';
+import { LaunchMilestoneEvent, LaunchesService } from './launches.service';
+import { Ll2Service } from './ll2.service';
+
+const launchMilestoneEventModelMock = {};
+
+@Module({
+  providers: [
+    LaunchesService,
+    Ll2Service,
+    {
+      provide: getModelToken(LaunchMilestoneEvent.name),
+      useValue: launchMilestoneEventModelMock,
+    },
+  ],
+})
+							class LaunchesFeatureModule {}</code></pre>
+						</div>
+						<div class="explain-grid">
+							<div class="explain-card">
+								<h3>Why this token?</h3>
+								<p><code>@InjectModel(LaunchMilestoneEvent.name)</code> resolves through the Mongoose model token, not the raw string name.</p>
+							</div>
+							<div class="explain-card">
+								<h3>What fails without it?</h3>
+								<p>If that provider is missing, <code>Test.createTestingModule(...).compile()</code> fails before the app starts.</p>
+							</div>
+							<div class="explain-card">
+								<h3>Why is an empty object enough?</h3>
+								<p>This test does not hit the code path that uses the model methods, so DI only needs a placeholder.</p>
+							</div>
+							<div class="explain-card">
+								<h3>When to use more?</h3>
+								<p>If the test exercises persistence, mock the specific model methods or switch to a real database-backed slice.</p>
+							</div>
+						</div>
+					</div>
+					<aside class="notes">
+						This is the key clarification for students who wonder why a launches HTTP test needs any Mongo setup at all. The answer is DI, not behavior. Nest has to instantiate LaunchesService, and that constructor asks for a model. Because this particular test does not call the methods that use the model, an empty object is enough. If the test did exercise event persistence, then the fake would need the specific methods used by the service, or we would use a real database-backed slice instead.
+					</aside>
+				</section>
+
 				<section>
 					<h2>Example: import a feature module</h2>
 					<div class="example-card">
 						<h3>Narrow the slice up front</h3>
 						<p>Boot only the feature under test.</p>
-						<pre><code class="language-ts">const moduleRef = await Test.createTestingModule({
+						<pre><code class="language-ts">import { Test } from '@nestjs/testing';
+import { FavouritesModule } from './favourites.module';
+import { FavouritesService } from './favourites.service';
+
+const moduleRef = await Test.createTestingModule({
   imports: [FavouritesModule],
 }).compile();
 
@@ -708,7 +842,11 @@ await service.add('falcon-9');</code></pre>
 					<div class="example-card">
 						<h3>Swap one external seam</h3>
 						<p>Keep the slice real, change one dependency.</p>
-						<pre><code class="language-ts">const moduleRef = await Test.createTestingModule({
+						<pre><code class="language-ts">import { Test } from '@nestjs/testing';
+import { LaunchesModule } from './launches.module';
+import { Ll2Service } from './ll2.service';
+
+const moduleRef = await Test.createTestingModule({
   imports: [LaunchesModule],
 })
   .overrideProvider(Ll2Service)
