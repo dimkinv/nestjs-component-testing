@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "presentations": "http-server ./presentations"
+    "presentations": "http-server ./presentations",
+    "launchpad": "cd launch-pad && npm start"
   },
   "keywords": [],
   "author": "",

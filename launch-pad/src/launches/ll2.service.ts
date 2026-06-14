@@ -1,6 +1,7 @@
 import {
   BadGatewayException,
   Injectable,
+  Logger,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import {
@@ -47,11 +48,14 @@ interface Ll2RocketConfiguration {
 
 @Injectable()
 export class Ll2Service {
+  private readonly logger = new Logger(Ll2Service.name);
   private readonly ll2ApiBaseUrl =
     process.env.LL2_BASE_URL ?? 'https://ll.thespacedevs.com/2.3.0';
   private readonly ll2ProxyUrl =
     process.env.LL2_PROXY_URL ?? 'http://cso.proxy.att.com:8888';
-  private readonly ll2ProxyAgent = new ProxyAgent(this.ll2ProxyUrl);
+  private readonly ll2ProxyAgent = this.ll2ProxyUrl
+    ? new ProxyAgent(this.ll2ProxyUrl)
+    : undefined;
 
   async getLaunches(): Promise<LaunchSummary[]> {
     const launches = await this.fetchLl2<Ll2LaunchListResponse>(
@@ -118,12 +122,16 @@ export class Ll2Service {
     options?: { allowNotFound?: boolean },
   ): Promise<T> {
     let response: UndiciResponse;
+    const url = this.buildLl2Url(path);
+
+    this.logger.log(`Fetching LL2: ${url}${this.ll2ProxyAgent ? ' (via proxy)' : ''}`);
 
     try {
-      response = await undiciFetch(this.buildLl2Url(path), {
-        dispatcher: this.ll2ProxyAgent,
+      response = await undiciFetch(url, {
+        ...(this.ll2ProxyAgent && { dispatcher: this.ll2ProxyAgent }),
       });
     } catch (error) {
+      this.logger.error(`LL2 fetch failed for ${path}: ${error}`);
       throw new ServiceUnavailableException(
         `Unable to reach LL2 API for ${path}`,
         {
@@ -131,6 +139,8 @@ export class Ll2Service {
         },
       );
     }
+
+    this.logger.log(`LL2 response for ${path}: ${response.status}`);
 
     if (options?.allowNotFound && response.status === 404) {
       return null as T;
@@ -146,7 +156,11 @@ export class Ll2Service {
   }
 
   private buildLl2Url(path: string): string {
-    const url = new URL(path, this.ll2ApiBaseUrl);
+    const base = this.ll2ApiBaseUrl.endsWith('/')
+      ? this.ll2ApiBaseUrl
+      : this.ll2ApiBaseUrl + '/';
+    const relativePath = path.startsWith('/') ? path.slice(1) : path;
+    const url = new URL(relativePath, base);
 
     if (!url.searchParams.has('format')) {
       url.searchParams.set('format', 'json');

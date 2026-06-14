@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LaunchPad</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    header h1 {
+      font-size: 1.3rem;
+      color: #58a6ff;
+      white-space: nowrap;
+    }
+
+    header h1::before {
+      content: '🚀 ';
+    }
+
+    .user-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    .user-bar label {
+      font-size: 0.85rem;
+      color: #8b949e;
+    }
+
+    .user-bar input {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      color: #e6edf3;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      width: 160px;
+    }
+
+    .user-bar input:focus {
+      outline: none;
+      border-color: #58a6ff;
+    }
+
+    nav {
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      padding: 0 24px;
+      display: flex;
+      gap: 0;
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      color: #8b949e;
+      padding: 12px 16px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    nav button:hover { color: #e6edf3; }
+    nav button.active {
+      color: #58a6ff;
+      border-bottom-color: #58a6ff;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 24px auto;
+      padding: 0 24px;
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
+
+    .card:hover { border-color: #58a6ff; }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+      color: #e6edf3;
+    }
+
+    .card .meta {
+      font-size: 0.8rem;
+      color: #8b949e;
+      margin-top: 4px;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .badge-upcoming { background: #1f6feb33; color: #58a6ff; }
+    .badge-past { background: #23863633; color: #3fb950; }
+
+    .btn {
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #e6edf3;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn:hover { background: #30363d; }
+    .btn-primary { background: #1f6feb; border-color: #1f6feb; }
+    .btn-primary:hover { background: #388bfd; }
+    .btn-danger { background: #da3633; border-color: #da3633; }
+    .btn-danger:hover { background: #f85149; }
+    .btn-star { background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 4px; }
+
+    .actions { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+
+    .detail-view {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 24px;
+    }
+
+    .detail-view h2 { margin-bottom: 16px; color: #58a6ff; }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .detail-field label {
+      display: block;
+      font-size: 0.75rem;
+      color: #8b949e;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .detail-field span {
+      font-size: 0.95rem;
+    }
+
+    .back-btn {
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+
+    .events-timeline {
+      margin-top: 16px;
+      border-left: 2px solid #30363d;
+      padding-left: 16px;
+    }
+
+    .event-item {
+      position: relative;
+      margin-bottom: 16px;
+      padding: 8px 12px;
+      background: #0d1117;
+      border-radius: 6px;
+      border: 1px solid #30363d;
+    }
+
+    .event-item::before {
+      content: '';
+      position: absolute;
+      left: -22px;
+      top: 14px;
+      width: 10px;
+      height: 10px;
+      background: #58a6ff;
+      border-radius: 50%;
+    }
+
+    .event-type {
+      font-weight: 600;
+      color: #58a6ff;
+      font-size: 0.85rem;
+    }
+
+    .event-time {
+      font-size: 0.75rem;
+      color: #8b949e;
+      margin-left: 8px;
+    }
+
+    .event-desc {
+      font-size: 0.85rem;
+      margin-top: 4px;
+      color: #8b949e;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px;
+      color: #8b949e;
+    }
+
+    .empty-state .icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+    .loading {
+      text-align: center;
+      padding: 32px;
+      color: #8b949e;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 0.85rem;
+      z-index: 1000;
+      animation: slideIn 0.3s ease;
+    }
+
+    .toast.error { border-color: #da3633; color: #f85149; }
+    .toast.success { border-color: #3fb950; color: #3fb950; }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>LaunchPad</h1>
+    <div class="user-bar">
+      <label for="userId">User ID:</label>
+      <input type="text" id="userId" placeholder="Enter username" value="astronaut-1">
+    </div>
+  </header>
+
+  <nav>
+    <button class="active" data-panel="launches">Launches</button>
+    <button data-panel="favorites">⭐ Favorites</button>
+  </nav>
+
+  <main>
+    <!-- Launches List Panel -->
+    <div id="launches-panel" class="panel active">
+      <div id="launches-list"></div>
+    </div>
+
+    <!-- Launch Detail Panel -->
+    <div id="detail-panel" class="panel">
+      <button class="btn back-btn" onclick="showPanel('launches')">&larr; Back to launches</button>
+      <div id="launch-detail"></div>
+    </div>
+
+    <!-- Favorites Panel -->
+    <div id="favorites-panel" class="panel">
+      <div id="favorites-list"></div>
+    </div>
+  </main>
+
+  <script>
+    const API = '';
+
+    function getUserId() {
+      return document.getElementById('userId').value.trim();
+    }
+
+    function headers() {
+      const h = { 'Content-Type': 'application/json' };
+      const uid = getUserId();
+      if (uid) h['x-user-id'] = uid;
+      return h;
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // Navigation
+    document.querySelectorAll('nav button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        showPanel(btn.dataset.panel);
+      });
+    });
+
+    function showPanel(name) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+
+      if (name === 'launches') {
+        document.getElementById('launches-panel').classList.add('active');
+        document.querySelector('[data-panel="launches"]').classList.add('active');
+        loadLaunches();
+      } else if (name === 'favorites') {
+        document.getElementById('favorites-panel').classList.add('active');
+        document.querySelector('[data-panel="favorites"]').classList.add('active');
+        loadFavorites();
+      } else if (name === 'detail') {
+        document.getElementById('detail-panel').classList.add('active');
+      }
+    }
+
+    // Load launches
+    async function loadLaunches() {
+      const container = document.getElementById('launches-list');
+      container.innerHTML = '<div class="loading">Loading launches...</div>';
+
+      try {
+        const res = await fetch(`${API}/launches`, { headers: headers() });
+        const { data } = await res.json();
+
+        if (!data || data.length === 0) {
+          container.innerHTML = '<div class="empty-state"><div class="icon">🚀</div><p>No launches found</p></div>';
+          return;
+        }
+
+        container.innerHTML = data.map(launch => `
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3>${escapeHtml(launch.name)}</h3>
+                <div class="meta">${escapeHtml(launch.missionName || '—')} · ${formatDate(launch.launchDateUtc)}</div>
+              </div>
+              <span class="badge badge-${launch.status}">${launch.status}</span>
+            </div>
+            <div class="actions">
+              <button class="btn" onclick="viewLaunch('${escapeAttr(launch.id)}')">View Details</button>
+              <button class="btn btn-star" onclick="addFavorite('${escapeAttr(launch.id)}')" title="Add to favorites">☆</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        container.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><p>Failed to load launches</p></div>';
+        showToast('Failed to load launches', 'error');
+      }
+    }
+
+    // View single launch
+    async function viewLaunch(id) {
+      showPanel('detail');
+      const container = document.getElementById('launch-detail');
+      container.innerHTML = '<div class="loading">Loading launch details...</div>';
+
+      try {
+        const res = await fetch(`${API}/launches/${encodeURIComponent(id)}`, { headers: headers() });
+        const { data } = await res.json();
+
+        if (!data) {
+          container.innerHTML = '<div class="empty-state"><p>Launch not found</p></div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="detail-view">
+            <h2>${escapeHtml(data.name)}</h2>
+            <div class="detail-grid">
+              <div class="detail-field">
+                <label>Mission</label>
+                <span>${escapeHtml(data.missionName || '—')}</span>
+              </div>
+              <div class="detail-field">
+                <label>Status</label>
+                <span class="badge badge-${data.status}">${data.status}</span>
+              </div>
+              <div class="detail-field">
+                <label>Launch Date</label>
+                <span>${formatDate(data.launchDateUtc)}</span>
+              </div>
+              <div class="detail-field">
+                <label>Rocket</label>
+                <span>${data.rocket ? escapeHtml(data.rocket.name + ' (' + data.rocket.type + ')') : '—'}</span>
+              </div>
+              <div class="detail-field">
+                <label>Launch Pad</label>
+                <span>${data.launchpad ? escapeHtml(data.launchpad.name) : '—'}</span>
+              </div>
+              <div class="detail-field">
+                <label>Location</label>
+                <span>${data.launchpad ? escapeHtml(data.launchpad.locality) : '—'}</span>
+              </div>
+            </div>
+            ${data.details ? `<p style="margin-bottom:16px;color:#8b949e;font-size:0.9rem">${escapeHtml(data.details)}</p>` : ''}
+            <div class="actions">
+              <button class="btn btn-primary" onclick="addFavorite('${escapeAttr(data.id)}')">⭐ Add to Favorites</button>
+              <button class="btn" onclick="simulateLaunch('${escapeAttr(data.id)}')">🔥 Simulate Launch</button>
+              <button class="btn" onclick="loadEvents('${escapeAttr(data.id)}')">📡 View Events</button>
+            </div>
+            <div id="events-container"></div>
+          </div>
+        `;
+      } catch (err) {
+        container.innerHTML = '<div class="empty-state"><p>Failed to load launch details</p></div>';
+        showToast('Failed to load details', 'error');
+      }
+    }
+
+    // Simulate launch
+    async function simulateLaunch(id) {
+      try {
+        const res = await fetch(`${API}/launches/${encodeURIComponent(id)}/simulate`, {
+          method: 'POST',
+          headers: headers(),
+        });
+        const { data } = await res.json();
+        showToast(`Launch simulation queued! ${data.events.length} events generated.`);
+        loadEvents(id);
+      } catch (err) {
+        showToast('Failed to simulate launch', 'error');
+      }
+    }
+
+    // Load events for a launch
+    async function loadEvents(id) {
+      const container = document.getElementById('events-container');
+      if (!container) return;
+      container.innerHTML = '<div class="loading" style="margin-top:16px">Loading events...</div>';
+
+      try {
+        const res = await fetch(`${API}/launches/${encodeURIComponent(id)}/events`, { headers: headers() });
+        const { data } = await res.json();
+
+        if (!data || data.length === 0) {
+          container.innerHTML = '<div class="empty-state" style="padding:24px"><p>No events yet. Try simulating the launch!</p></div>';
+          return;
+        }
+
+        container.innerHTML = `
+          <h3 style="margin-top:24px;margin-bottom:12px;color:#8b949e;font-size:0.85rem;text-transform:uppercase">Launch Events Timeline</h3>
+          <div class="events-timeline">
+            ${data.map(evt => `
+              <div class="event-item">
+                <span class="event-type">${escapeHtml(evt.type)}</span>
+                <span class="event-time">${escapeHtml(evt.missionTime)}</span>
+                <div class="event-desc">${escapeHtml(evt.description)}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } catch (err) {
+        container.innerHTML = '<div class="empty-state" style="padding:24px"><p>Failed to load events</p></div>';
+      }
+    }
+
+    // Favorites
+    async function addFavorite(launchId) {
+      if (!getUserId()) {
+        showToast('Please set a User ID first', 'error');
+        return;
+      }
+      try {
+        const res = await fetch(`${API}/launches/${encodeURIComponent(launchId)}/favorite`, {
+          method: 'POST',
+          headers: headers(),
+        });
+        if (!res.ok) throw new Error();
+        showToast('Added to favorites!');
+      } catch (err) {
+        showToast('Failed to add favorite', 'error');
+      }
+    }
+
+    async function removeFavorite(launchId) {
+      if (!getUserId()) {
+        showToast('Please set a User ID first', 'error');
+        return;
+      }
+      try {
+        const res = await fetch(`${API}/launches/${encodeURIComponent(launchId)}/favorite`, {
+          method: 'DELETE',
+          headers: headers(),
+        });
+        if (!res.ok) throw new Error();
+        showToast('Removed from favorites');
+        loadFavorites();
+      } catch (err) {
+        showToast('Failed to remove favorite', 'error');
+      }
+    }
+
+    async function loadFavorites() {
+      const container = document.getElementById('favorites-list');
+      if (!getUserId()) {
+        container.innerHTML = '<div class="empty-state"><div class="icon">👤</div><p>Set a User ID to view favorites</p></div>';
+        return;
+      }
+      container.innerHTML = '<div class="loading">Loading favorites...</div>';
+
+      try {
+        const res = await fetch(`${API}/favorites`, { headers: headers() });
+        const { data } = await res.json();
+
+        if (!data || data.length === 0) {
+          container.innerHTML = '<div class="empty-state"><div class="icon">⭐</div><p>No favorites yet. Star a launch to add it here!</p></div>';
+          return;
+        }
+
+        container.innerHTML = data.map(fav => `
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h3>${escapeHtml(fav.launchId)}</h3>
+                <div class="meta">Favorited ${formatDate(fav.favoritedAt)}</div>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn" onclick="viewLaunch('${escapeAttr(fav.launchId)}')">View Details</button>
+              <button class="btn btn-danger" onclick="removeFavorite('${escapeAttr(fav.launchId)}')">Remove</button>
+            </div>
+          </div>
+        `).join('');
+      } catch (err) {
+        container.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><p>Failed to load favorites</p></div>';
+        showToast('Failed to load favorites', 'error');
+      }
+    }
+
+    // Helpers
+    function escapeHtml(str) {
+      if (!str) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function escapeAttr(str) {
+      if (!str) return '';
+      return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '—';
+      try {
+        return new Date(dateStr).toLocaleDateString('en-US', {
+          year: 'numeric', month: 'short', day: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        });
+      } catch { return dateStr; }
+    }
+
+    // Initial load
+    loadLaunches();
+  </script>
+</body>
+</html>
