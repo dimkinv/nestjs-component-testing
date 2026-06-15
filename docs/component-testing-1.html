@@ -358,12 +358,10 @@
 					<h2>Resources</h2>
 					<div style="display: flex; justify-content: center; gap: 3em; margin-top: 1em;">
 						<div style="text-align: center;">
-							<img width="280" src="./images/presentations-url.png" alt="Presentations URL QR code" />
 							<p style="font-size: 0.6em;">Presentations</p>
 							<p style="font-size: 0.4em; font-family: monospace;">dimkinv.github.io/nestjs-component-testing</p>
 						</div>
 						<div style="text-align: center;">
-							<img width="280" src="./images/github-url.png" alt="GitHub URL QR code" />
 							<p style="font-size: 0.6em;">GitHub Repo</p>
 							<p style="font-size: 0.4em; font-family: monospace;">github.com/dimkinv/nestjs-component-testing</p>
 						</div>
@@ -379,7 +377,7 @@
 				<section>
 					<h3>Orbital Mechanics</h3>
 					<p>This is what actually happen</p>
-					<img width="600" src="./images/launch-spacex.jpeg" alt="SpaceX rocket launch trajectory" />
+					<img width="600" src="./images/launch-spacex.jpeg" alt="Rocket launch trajectory" />
 				</section>
 
 				<section>
@@ -415,25 +413,24 @@
 				</section>
 
 				<section>
-					<h2>LaunchPad</h2>
-					<div class="card-grid">
-						<div class="card">
-							<h3>What students get</h3>
-							<p>A working Nest.js backend application with real integration boundaries.</p>
-						</div>
-						<div class="card">
-							<h3>What we will do</h3>
-							<p>Use it as the surface for controller, service, and module-level component tests.</p>
-						</div>
-						<div class="card">
-							<h3>Main seams</h3>
-							<p>Upstream HTTP calls, persistence, and event-style behavior inside one app.</p>
-						</div>
-						<div class="card">
-							<h3>Live walkthrough</h3>
-							<p>This is the point where we open the project and orient ourselves before testing it.</p>
-						</div>
-					</div>
+					<h3 style="color: red">~500M USD bug!</h3>
+				</section>
+
+				<section>
+					<h2>Today&apos;s focus</h2>
+					<ul>
+						<li>UT + component + integration</li>
+						<li>What a component means in Nest.js</li>
+						<li>TestingModule and selective mocking</li>
+						<li>Map it to LaunchPad demo project</li>
+					</ul>
+					<aside class="notes">
+						Keep this as the agenda slide. The purpose is to orient the room, not explain each item yet.
+					</aside>
+				</section>
+
+				<section>
+					<img src="./images/launchpad.png" />
 					<aside class="notes">
 						Keep this intentionally generic. The slide should anchor the repo walkthrough without trying to replace it. Use it while showing the folder structure, modules, controllers, and the app shape in the editor.
 					</aside>
@@ -459,9 +456,19 @@
 				</section>
 
 				<section>
-					<h3 style="color: red">~500M USD bug!</h3>
+					<h2>Bruno API Collection</h2>
+					<ul>
+						<li>The repo includes a <code>bruno/</code> folder with pre-built API requests</li>
+						<li>Use it to hand-test endpoints while developing</li>
+						<li>Covers launches, favorites, and launch events</li>
+					</ul>
+					<p style="margin-top: 1em; font-size: 0.6em;">
+						Download Bruno: <a href="https://www.usebruno.com/downloads" target="_blank">usebruno.com/downloads</a>
+					</p>
+					<aside class="notes">
+						Bruno is an open-source API client (like Postman). The collection in the repo lets students quickly verify their running app without writing curl commands. They can import the collection by opening the bruno/ folder from within Bruno.
+					</aside>
 				</section>
-
 				<section>
 					<h3>Different types of tests</h3>
 					<div class="r-stack">
@@ -528,23 +535,10 @@
 				</section>
 
 				<section>
-					<h2>Today&apos;s focus</h2>
-					<ul>
-						<li>UT + component + integration</li>
-						<li>What a component means in Nest.js</li>
-						<li>TestingModule and selective mocking</li>
-						<li>Map it to LaunchPad demo project</li>
-					</ul>
-					<aside class="notes">
-						Keep this as the agenda slide. The purpose is to orient the room, not explain each item yet.
-					</aside>
-				</section>
-
-				<section>
 					<h2>Why unit tests are not enough</h2>
 					<div class="fragment">
 						<ul>
-							<li>Weak at integration seams</li>
+							<li>Weak at integration boundaries</li>
 							<li>Mocks can hide real failures</li>
 						</ul>
 					</div>
@@ -575,7 +569,7 @@
 					<h2>A practical balance for Nest.js services</h2>
 					<ul>
 						<li>Unit: fast feedback on logic</li>
-						<li>Component: main confidence layer</li>
+						<li>Component: primary verification layer</li>
 						<li>Integration/E2E: critical paths only</li>
 					</ul>
 					<aside class="notes">
@@ -591,7 +585,7 @@
 						<li>Often a module, controller, or service with collaborators</li>
 					</ul>
 					<aside class="notes">
-						Define component in a practical way, not dogmatically. In Nest, a component test usually means a controller with pipes, guards, and services wired up, or a service with real framework configuration around it. The key is that we test behavior at a seam users or neighboring systems care about, not just one class in isolation.
+						Define component in a practical way, not dogmatically. In Nest, a component test usually means a controller with pipes, guards, and services wired up, or a service with real framework configuration around it. The key is that we test behavior at a boundary users or neighboring systems care about, not just one class in isolation.
 					</aside>
 				</section>
 
@@ -612,7 +606,7 @@
 						</div>
 						<div class="card">
 							<h3>Near-E2E slice</h3>
-							<p>Nest app instance plus only a few controlled external seams</p>
+							<p>Nest app instance plus only a few controlled external boundaries</p>
 						</div>
 					</div>
 					<aside class="notes">
@@ -675,7 +669,7 @@
 					<ul>
 						<li>Build a Nest app slice in memory</li>
 						<li>Choose which providers are real</li>
-						<li>Override only the seams you want to control</li>
+						<li>Override only the boundaries you want to control</li>
 					</ul>
 					<aside class="notes">
 						This is the transition into the practical section. TestingModule is how we control the realism level. We can compile a feature module, instantiate services directly, or create a full INestApplication and send requests into it.
@@ -685,28 +679,29 @@
 				<section>
 					<h2>Typical TestingModule flow</h2>
 					<div class="card">
-					<pre><code class="language-ts">const moduleRef = await Test.createTestingModule({
+					<pre><code class="language-ts">import { Test } from '@nestjs/testing';
+import { AppModule } from './app.module';
+import { FavouritesService } from './favourites/favourites.service';
+
+const moduleRef = await Test.createTestingModule({
   imports: [AppModule],
 })
-  .overrideProvider(Ll2Service)
-  .useValue(mockLl2Service)
+  .overrideProvider(FavouritesService)
+  .useValue(mockFavouritesService)
   .compile();
 
 const app = moduleRef.createNestApplication();
 await app.init();</code></pre>
 </div>
 					<aside class="notes">
-						Walk through the three decisions here: what module to import, what to override, and whether to get a service directly or create a Nest application. Emphasize that the override should target a real seam, not every collaborator by default.
+						Walk through the three decisions here: what module to import, what to override, and whether to get a service directly or create a Nest application. Emphasize that the override should target a real boundary, not every collaborator by default.
 					</aside>
 				</section>
 
 				<section>
 					<h2>Four ways to use it</h2>
 					<div class="card-grid">
-						<div class="card">
-							<h3>Get a service</h3>
-							<p>Fastest path for service-level component tests</p>
-						</div>
+						
 						<div class="card">
 							<h3>Create an app</h3>
 							<p>Exercise controllers through real HTTP requests</p>
@@ -718,6 +713,10 @@ await app.init();</code></pre>
 						<div class="card">
 							<h3>Override a provider</h3>
 							<p>Swap one dependency without destroying the full slice</p>
+						</div>
+						<div class="card">
+							<h3>Get a service</h3>
+							<p>Fastest path for service-level component tests</p>
 						</div>
 					</div>
 					<aside class="notes">
@@ -744,29 +743,6 @@ await expect(service.findAll()).resolves.toHaveLength(3);</code></pre>
 					</div>
 					<aside class="notes">
 						This is the lightest harness. The important point is that the TestingModule stops at DI compilation and we pull the service directly, so there is no Nest application instance and no HTTP surface involved.
-					</aside>
-				</section>
-
-				<section>
-					<h2>Example: create an app</h2>
-					<div class="card">
-						<h3>Same module, plus HTTP surface</h3>
-						<p>Turn the module into an HTTP app.</p>
-						<pre><code class="language-ts">import { Test } from '@nestjs/testing';
-import request from 'supertest';
-import { LaunchesModule } from './launches.module';
-
-const moduleRef = await Test.createTestingModule({
-  imports: [LaunchesModule],
-}).compile();
-
-const app = moduleRef.createNestApplication();
-await app.init();
-await request(app.getHttpServer()).get('/launches').expect(200);</code></pre>
-						<p class="exercise-path">Exercise: src/tests-exercises/create-an-app.exercise.spec.ts</p>
-					</div>
-					<aside class="notes">
-						The compile step is the same shape, but now we continue into createNestApplication because the controller, routing, and response behavior are part of what we want to verify.
 					</aside>
 				</section>
 
@@ -844,7 +820,7 @@ await service.add('falcon-9');</code></pre>
 				<section>
 					<h2>Example: override a provider</h2>
 					<div class="card">
-						<h3>Swap one external seam</h3>
+						<h3>Swap one external boundary</h3>
 						<p>Keep the slice real, change one dependency.</p>
 						<pre><code class="language-ts">import { Test } from '@nestjs/testing';
 import { LaunchesModule } from './launches.module';
@@ -864,38 +840,25 @@ const moduleRef = await Test.createTestingModule({
 				</section>
 
 				<section>
-					<h2>Selective mocking beats total mocking</h2>
-					<ul>
-						<li>Keep internal wiring real</li>
-						<li>Mock expensive or unstable boundaries</li>
-						<li>Avoid asserting implementation details</li>
-					</ul>
-					<aside class="notes">
-						This is the key mindset. If every dependency is mocked, the test is just a dressed-up unit test. The value comes from keeping controllers, services, pipes, and response shaping real while mocking only the boundary that makes the test slow, flaky, or out of scope.
-					</aside>
-				</section>
+					<h2>Example: create an app</h2>
+					<div class="card">
+						<h3>Same module, plus HTTP surface</h3>
+						<p>Turn the module into an HTTP app.</p>
+						<pre><code class="language-ts">import { Test } from '@nestjs/testing';
+import request from 'supertest';
+import { LaunchesModule } from './launches.module';
 
-				<section>
-					<h2>Where to keep real behavior vs. where to mock</h2>
-					<ul>
-						<li>Keep routing, validation, serialization, and feature services real</li>
-						<li>Mock upstream HTTP clients, publishers, and unstable SDKs first</li>
-						<li>Assert user-visible outcomes more than internal calls</li>
-					</ul>
-					<aside class="notes">
-						Keep the behavior-producing layers real. That usually includes DTO validation, controller-to-service flow, error mapping, and most provider collaboration inside the feature. Mock external seams or side effects you intentionally do not want today. The principle is not anti-mock; it is mock at the right boundary and keep assertions focused on observable behavior.
-					</aside>
-				</section>
+const moduleRef = await Test.createTestingModule({
+  imports: [LaunchesModule],
+}).compile();
 
-				<section>
-					<h2>Controller test pattern</h2>
-					<ul>
-						<li>Import feature module or declare controller + providers</li>
-						<li>Create <code>INestApplication</code></li>
-						<li>Send requests with Supertest</li>
-					</ul>
+const app = moduleRef.createNestApplication();
+await app.init();
+await request(app.getHttpServer()).get('/launches').expect(200);</code></pre>
+						<p class="exercise-path">Exercise: src/tests-exercises/create-an-app.exercise.spec.ts</p>
+					</div>
 					<aside class="notes">
-						This is the pattern for near-E2E checks inside one feature. You are not calling controller methods directly. You want the HTTP surface, framework glue, and response behavior involved.
+						The compile step is the same shape, but now we continue into createNestApplication because the controller, routing, and response behavior are part of what we want to verify.
 					</aside>
 				</section>
 
@@ -936,16 +899,38 @@ await request(app.getHttpServer())
 				</section>
 
 				<section>
-					<h2>Service or module test pattern</h2>
+					<h2>Exercise time</h2>
 					<ul>
-						<li>Compile a module with the real providers you care about</li>
-						<li>Override only repositories, clients, or external tokens as needed</li>
-						<li>Verify the slice works together before asserting outbound details</li>
+						<li>Open <code>src/tests-exercises/</code></li>
+						<li>Work through the exercises</li>
+						<li>Solutions are in <code>src/tests-exercises-solution/</code></li>
+					</ul>
+				</section>
+
+				<section>
+					<h2>Selective mocking beats total mocking</h2>
+					<ul>
+						<li>Keep internal wiring real</li>
+						<li>Mock expensive or unstable boundaries</li>
+						<li>Avoid asserting implementation details</li>
 					</ul>
 					<aside class="notes">
-						Use this when HTTP is not the main risk or when behavior spans several providers inside the feature. It is often the best balance between confidence and setup size because Nest DI and configuration stay realistic while the harness remains lighter than a full app instance.
+						This is the key mindset. If every dependency is mocked, the test is just a dressed-up unit test. The value comes from keeping controllers, services, pipes, and response shaping real while mocking only the boundary that makes the test slow, flaky, or out of scope.
 					</aside>
 				</section>
+
+				<section>
+					<h2>Where to keep real behavior vs. where to mock</h2>
+					<ul>
+						<li>Keep routing, validation, serialization, and feature services real</li>
+						<li>Mock upstream HTTP clients and publishers</li>
+					</ul>
+					<aside class="notes">
+						Keep the behavior-producing layers real. That usually includes DTO validation, controller-to-service flow, error mapping, and most provider collaboration inside the feature. Mock external boundaries or side effects you intentionally do not want today. The principle is not anti-mock; it is mock at the right boundary and keep assertions focused on observable behavior.
+					</aside>
+				</section>
+
+
 
 				<section>
 					<h2>Common mistakes</h2>
@@ -965,11 +950,15 @@ await request(app.getHttpServer())
 						<li>Unit tests are necessary, not sufficient</li>
 						<li><span class="accent">Component tests</span> add realistic confidence</li>
 						<li>TestingModule is how we control realism in Nest</li>
-						<li>Meeting 2 adds infrastructure realism on top of this foundation</li>
 					</ul>
 					<aside class="notes">
 						Close by reinforcing the three requested ideas. Unit tests are necessary but do not validate behavior across real boundaries. Modern backend strategy gives component tests a central role. The practical skill students leave with today is using TestingModule to build realistic Nest test harnesses and deciding where mocks should live.
 					</aside>
+				</section>
+
+				<section>
+					<h1>Thanks!</h1>
+					<h2>Questions?</h2>
 				</section>
 			</div>
 		</div>
