@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "presentations": "http-server ./presentations",
+    "presentations": "http-server ./docs",
     "launchpad": "cd launch-pad && npm start"
   },
   "keywords": [],
